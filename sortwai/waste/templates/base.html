@@ -1,0 +1,53 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.iconify.design/iconify-icon/2.2.0/iconify-icon.min.js"></script>
+
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+    <title>SortWAI</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="brand">Placeholder názov</h1>
+
+        <form action="" class="search">
+            <input type="search" name="q" placeholder="Ako triediť...?" class="search__input">
+            <button class="search__button" type="submit">
+                <iconify-icon icon="mdi:search"></iconify-icon>
+                <span class="search__button_text">Vyhľadať</span>
+            </button>
+            <a href="#" class="search__button">
+                <iconify-icon icon="mdi:barcode-scan"></iconify-icon>
+                <span class="search__button_text">Čiarový kód</span>
+            </a>
+        </form>
+
+        <div class="location_note">
+            Zobrazujeme informácie pre <b>Bratislava</b> <a href="#">(zmeniť)</a>
+        </div>
+
+        <div class="tabs">
+            <a href="#" class="tabs__item {% if request.resolver_match.url_name == 'category_list' %}tabs__item--active{% endif %}">
+                Odpad
+            </a>
+            <a href="#" class="tabs__item">
+                Miesta
+            </a>
+            <a href="#" class="tabs__item">
+                Dokumenty
+            </a>
+        </div>
+
+        {% block body %}{% endblock %}
+    </div>
+
+    <a href="#" class="chat_cta">
+        <iconify-icon icon="mdi:chat-question" width="none"></iconify-icon>
+    </a>
+</body>
+</html>
