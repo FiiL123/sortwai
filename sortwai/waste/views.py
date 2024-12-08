@@ -1,5 +1,5 @@
 from django.views.generic import ListView
-from sortwai.waste.models import Category, Municipality
+from sortwai.waste.models import Category, Municipality, Document
 
 
 def get_active_municipality(request):
@@ -14,3 +14,10 @@ class CategoryListView(ListView):
 
     def get_queryset(self):
         return Category.objects.filter(municipality=get_active_municipality(self.request))
+
+
+class DocumentListView(ListView):
+    template_name = "docs.html"
+
+    def get_queryset(self):
+        return Document.objects.filter(municipality=get_active_municipality(self.request))

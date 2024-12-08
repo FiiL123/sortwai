@@ -32,13 +32,13 @@
         </div>
 
         <div class="tabs">
-            <a href="#" class="tabs__item {% if request.resolver_match.url_name == 'category_list' %}tabs__item--active{% endif %}">
+            <a href="{% url "category_list" %}" class="tabs__item {% if request.resolver_match.url_name == 'category_list' %}tabs__item--active{% endif %}">
                 Odpad
             </a>
             <a href="#" class="tabs__item">
                 Miesta
             </a>
-            <a href="#" class="tabs__item">
+            <a href="{% url "document_list" %}" class="tabs__item {% if request.resolver_match.url_name == 'document_list' %}tabs__item--active{% endif %}">
                 Dokumenty
             </a>
         </div>

@@ -18,9 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from sortwai.waste.views import CategoryListView
+from sortwai.waste.views import CategoryListView, DocumentListView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", CategoryListView.as_view(), name="category_list"),
+    path("docs/", DocumentListView.as_view(), name="document_list"),
 ]

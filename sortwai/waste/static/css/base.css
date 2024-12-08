@@ -123,6 +123,10 @@ iconify-icon {
     @media (min-width: 768px) {
         flex: 0;
     }
+
+    &:hover {
+        color: var(--gray-darker);
+    }
 }
 
 .tabs__item--active {
@@ -130,6 +134,10 @@ iconify-icon {
     border-bottom: 3px solid var(--primary-dark);
     font-weight: 600;
     color: var(--primary-dark);
+
+    &:hover {
+        color: var(--primary-dark);
+    }
 }
 
 .waste_detail {
@@ -260,4 +268,8 @@ iconify-icon {
         width: 1.25rem;
         height: 1.25rem;
     }
+}
+
+.title {
+    margin-bottom: 1rem;
 }
