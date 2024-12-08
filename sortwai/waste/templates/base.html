@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.iconify.design/iconify-icon/2.2.0/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
 
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
@@ -35,7 +41,7 @@
             <a href="{% url "category_list" %}" class="tabs__item {% if request.resolver_match.url_name == 'category_list' %}tabs__item--active{% endif %}">
                 Odpad
             </a>
-            <a href="#" class="tabs__item">
+            <a href="{% url "location_list" %}" class="tabs__item {% if request.resolver_match.url_name == 'location_list' %}tabs__item--active{% endif %}">
                 Miesta
             </a>
             <a href="{% url "document_list" %}" class="tabs__item {% if request.resolver_match.url_name == 'document_list' %}tabs__item--active{% endif %}">

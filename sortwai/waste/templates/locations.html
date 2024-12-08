@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="map" id="map"></div>
+
+{{ map_pins|json_script:"pins" }}
+<script>
+// TODO: improve code quality here
+var map = L.map('map').setView([48.1521222, 17.0711575], 12);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+const pins = JSON.parse(document.getElementById("pins").innerText)
+
+for (const pin of pins) {
+    console.log(pin)
+    L.marker(pin).addTo(map);
+}
+</script>
+
+
+<div class="location_list">
+{% for object in object_list %}
+    <div class="location">
+        <div class="location__details">
+            <h2>{{ object.name }}</h2>
+            {{ object.description|linebreaks }}
+        </div>
+
+        <div class="location__targets">
+            {% for target in object.targets.all %}
+            <div class="waste_destination waste_destination--small">
+                <div class="waste_destination__name waste_destination__name--{{ target.color }}">{{ target.name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="location__address">
+            <iconify-icon icon="mdi:map-marker"></iconify-icon>
+            {{ object.address }}
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}

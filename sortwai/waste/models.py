@@ -68,6 +68,7 @@ class Location(models.Model):
     municipality = models.ForeignKey(
         Municipality, on_delete=models.CASCADE, null=True, blank=True
     )
+    show_on_main = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["name"]

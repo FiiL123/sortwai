@@ -145,6 +145,7 @@ iconify-icon {
     grid-template-columns: 1fr;
     gap: 0.5rem;
     margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 
     @media (min-width: 768px) {
         grid-template-columns: 1fr 1fr;
@@ -208,14 +209,13 @@ iconify-icon {
 .waste_destination {
     display: flex;
     align-items: center;
-    margin-top: 0.5rem;
     gap: 0.25rem;
     font-size: 0.875rem;
 }
 
-/*.waste_destination__arrow {*/
-/*    */
-/*}*/
+.waste_destination--small {
+    font-size: 0.6rem;
+}
 
 .waste_destination__name {
     border-radius: 0.25rem;
@@ -272,4 +272,38 @@ iconify-icon {
 
 .title {
     margin-bottom: 1rem;
+}
+
+.map {
+    margin-bottom: 1.5rem;
+    height: 24rem;
+}
+
+.location_list {
+    display: grid;
+    gap: 1rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.location {
+
+}
+
+.location__details {
+    margin-bottom: 0.5rem;
+}
+
+.location__address {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--gray-dark);
+}
+
+.location__targets {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
 }
