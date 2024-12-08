@@ -5,8 +5,10 @@
 {% for object in object_list %}
     <div class="card card--category">
         <div class="card__image">
-            <img src="https://picsum.photos/200/300" alt="">
-            {# TODO: Real image #}
+            {# TODO: handle missing image better #}
+            {% if object.image %}
+            <img src="{{ object.image.url }}" alt="{{ object.name }}">
+            {% endif %}
         </div>
 
         <div class="card__content">
