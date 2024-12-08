@@ -7,4 +7,6 @@ from sortwai.waste.models import Municipality
 
 
 class User(AbstractUser):
-    municipality = models.ForeignKey(Municipality, on_delete=models.CASCADE)
+    municipality = models.ForeignKey(
+        Municipality, on_delete=models.CASCADE, null=True, blank=True
+    )
