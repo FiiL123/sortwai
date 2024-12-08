@@ -13,7 +13,7 @@ services:
       context: .
       target: web
     ports:
-      - "8001:8000"
+      - "8000:8000"
     volumes:
       - ./:/app/
     environment:

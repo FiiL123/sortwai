@@ -15,5 +15,5 @@ docker compose run --rm web poetry run python manage.py migrate
 ```
 Load dummy data
 ```shell
-docker compose run --rm web python manage.py loaddata dummy-data.json
+docker compose run --rm web poetry run python manage.py loaddata dummy_data.json
 ```
