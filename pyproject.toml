@@ -17,6 +17,7 @@ django-probes = "^1.7.0"
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 pypdf = "^5.1.0"
 markdownify = "^0.14.1"
+pillow = "^11.0.0"
 
 [build-system]
 requires = ["poetry-core"]
