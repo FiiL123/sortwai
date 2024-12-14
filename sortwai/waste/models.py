@@ -1,6 +1,7 @@
 import os
 import secrets
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 # Create your models here.
@@ -38,9 +39,14 @@ class Target(models.Model):
 
 
 class Category(models.Model):
+    municipality = models.ForeignKey(
+        Municipality, on_delete=models.CASCADE, null=True, blank=True
+    )
     name = models.CharField(max_length=255, blank=True)
     image = models.ImageField(null=True, blank=True)
     description = models.TextField(blank=True)
+    do = models.TextField(blank=True)
+    dont = models.TextField(blank=True)
     target = models.ForeignKey(Target, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
@@ -62,6 +68,7 @@ class Location(models.Model):
     municipality = models.ForeignKey(
         Municipality, on_delete=models.CASCADE, null=True, blank=True
     )
+    show_on_main = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["name"]
