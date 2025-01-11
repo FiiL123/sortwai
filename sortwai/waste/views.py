@@ -1,6 +1,10 @@
-from django.http import HttpResponse
+import json
+
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
+from geopy import Nominatim
 
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
@@ -19,6 +23,15 @@ class CategoryListView(ListView):
         return Category.objects.filter(
             municipality=get_active_municipality(self.request)
         ).select_related("target")
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryListView, self).get_context_data(**kwargs)
+        if code := self.request.GET.get("q"):
+            item = BarCode.objects.filter(code=code)
+            if item:
+                item = item.first()
+                context.update({"item": item})
+        return context
 
 
 class DocumentListView(ListView):
@@ -56,3 +69,37 @@ def get_trash(request, code):
     item = item.first()
     context = {"item": item}
     return render(request, "partials/product.html", context)
+
+
+@csrf_exempt
+def get_city(request):
+    if request.method == "POST":
+        try:
+            # Parse the request body for latitude and longitude
+            data = json.loads(request.body)
+            latitude = data.get("latitude")
+            longitude = data.get("longitude")
+
+            if latitude is None or longitude is None:
+                return JsonResponse(
+                    {"error": "Invalid coordinates provided."}, status=400
+                )
+
+            # Initialize Nominatim geocoder
+            geolocator = Nominatim(user_agent="django_app")
+            location = geolocator.reverse((latitude, longitude), exactly_one=True)
+
+            if location:
+                # Extract city name from address details
+                address = location.raw.get("address", {})
+                city = address.get(
+                    "city", address.get("town", address.get("village", "Unknown"))
+                )
+                return JsonResponse({"city": city})
+            else:
+                return JsonResponse({"error": "City not found."}, status=404)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
