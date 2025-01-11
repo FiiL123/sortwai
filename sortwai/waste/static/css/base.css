@@ -307,3 +307,8 @@ iconify-icon {
     gap: 0.25rem;
     flex-wrap: wrap;
 }
+
+.center-items{
+    align-items: center;
+    justify-content: center;
+}
