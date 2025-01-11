@@ -1,7 +1,14 @@
 # Register your models here.
 from django.contrib import admin
 
-from sortwai.waste.models import Category, Document, Location, Municipality, Target
+from sortwai.waste.models import (
+    BarCode,
+    Category,
+    Document,
+    Location,
+    Municipality,
+    Target,
+)
 
 
 @admin.register(Municipality)
@@ -30,3 +37,10 @@ class LocationAdmin(admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ["name", "municipality"]
+
+
+@admin.register(BarCode)
+class BarCodeAdmin(admin.ModelAdmin):
+    list_display = ["code", "product_name", "material_number", "material_type"]
+    search_fields = ["product_name", "material_number", "material_type"]
+    list_filter = ["material_number", "material_type"]

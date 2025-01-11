@@ -1,0 +1,8 @@
+<div class="container" id="qr-reader-results">
+    <span>Názov predmetu: <h3>{{item.product_name }}</h3></span>
+    <span>Výrobca predmetu:<p>{{item.manufacturer}}</p></span>
+    <a class="search__button" type="submit" href="{% url 'category_list' %}?q={{item.code}}">Kam zahodiť
+        <iconify-icon icon="mdi:search"></iconify-icon>
+        <span class="search__button_text"></span>
+    </a>
+</div>

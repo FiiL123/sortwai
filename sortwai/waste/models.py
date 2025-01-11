@@ -1,7 +1,6 @@
 import os
 import secrets
 
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 # Create your models here.
@@ -91,3 +90,18 @@ class Document(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BarCode(models.Model):
+    code = models.CharField(max_length=255)
+    product_name = models.CharField(max_length=255, blank=True)
+    manufacturer = models.CharField(max_length=255, blank=True)
+    material = models.CharField(max_length=255, blank=True)
+    material_number = models.IntegerField(default=0)
+    material_type = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["material_number", "product_name"]
+
+    def __str__(self):
+        return self.code
