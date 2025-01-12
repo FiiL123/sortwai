@@ -38,7 +38,7 @@
         </form>
 
         <div class="location_note">
-            Zobrazujeme informácie pre <b id="municipality">Bratislava</b> <a href="#">(zmeniť)</a>
+            Zobrazujeme informácie pre <b id="municipality">Povoľte získavanie lokácie</b> <a href="#">(zmeniť)</a>
         </div>
 
         <div class="tabs">
@@ -59,25 +59,6 @@
     <a href="#" class="chat_cta">
         <iconify-icon icon="mdi:chat-question" width="none"></iconify-icon>
     </a>
-
-<script>
-
-    navigator.geolocation.getCurrentPosition(getCity);
-    async function getCity(position) {
-    fetch('{% url 'get_city' %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ latitude: position.coords.latitude, longitude: position.coords.longitude }), // Example coordinates for Bratislava
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('City:', data.city);
-            document.getElementById('municipality').innerHTML = data.city;
-        })
-        .catch(error => console.error('Error:', error));
-    }
-</script>
+<script src="{% static 'js/location.js' %}"></script>
 </body>
 </html>
