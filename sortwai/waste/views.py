@@ -10,10 +10,12 @@ from sortwai.waste.models import BarCode, Category, Document, Location, Municipa
 
 
 def get_active_municipality(request):
-    if not hasattr(request, "_municipality"):
-        request._municipality = Municipality.objects.first()
+    if city := request.COOKIES.get("municipality"):
+        municipality = Municipality.objects.filter(name=city)
+        if municipality.exists():
+            return municipality.first()
 
-    return request._municipality
+    return Municipality.objects.first()
 
 
 class CategoryListView(ListView):
@@ -95,7 +97,9 @@ def get_city(request):
                 city = address.get(
                     "city", address.get("town", address.get("village", "Unknown"))
                 )
-                return JsonResponse({"city": city})
+                response = JsonResponse({"city": city})
+                response.set_cookie("municipality", city, max_age=7 * 24 * 60 * 60)
+                return response
             else:
                 return JsonResponse({"error": "City not found."}, status=404)
 

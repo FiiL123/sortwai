@@ -15,7 +15,6 @@ async function getCity(position) {
             .then(data => {
                 console.log('City:', data.city);
                 document.getElementById('municipality').innerHTML = data.city;
-                document.cookie=`municipality=${data.city}; max_age=`+(24*60*60);
             })
             .catch(error => console.error('Error:', error));
     }
