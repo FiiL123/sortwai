@@ -1,21 +1,29 @@
 import json
 
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
 from geopy import Nominatim
 
+from sortwai.waste.forms import MunicipalityForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
 
 def get_active_municipality(request):
     if city := request.COOKIES.get("municipality"):
-        municipality = Municipality.objects.filter(name=city)
+        municipality = Municipality.objects.filter(id=city)
         if municipality.exists():
             return municipality.first()
 
-    return Municipality.objects.first()
+    return None
+
+
+def active_municipality(request):
+    if request.COOKIES.get("municipality"):
+        return {"municipality": get_active_municipality(request)}
+    else:
+        return {"municipality": None}
 
 
 class CategoryListView(ListView):
@@ -28,6 +36,8 @@ class CategoryListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CategoryListView, self).get_context_data(**kwargs)
+        municipality_form = MunicipalityForm()
+        context["municipality_form"] = municipality_form
         if code := self.request.GET.get("q"):
             item = BarCode.objects.filter(code=code)
             if item:
@@ -97,13 +107,26 @@ def get_city(request):
                 city = address.get(
                     "city", address.get("town", address.get("village", "Unknown"))
                 )
-                response = JsonResponse({"city": city})
-                response.set_cookie("municipality", city, max_age=7 * 24 * 60 * 60)
-                return response
-            else:
-                return JsonResponse({"error": "City not found."}, status=404)
+                municipality = Municipality.objects.filter(name=city)
+                if municipality.exists():
+                    response = JsonResponse({"city": city}, status=200)
+                    response.set_cookie("municipality", str(municipality.first().id))
+                    return response
+                else:
+                    return JsonResponse(
+                        {"error": "Municipality not found."}, status=404
+                    )
+        except Exception:
+            return JsonResponse({"error": "Invalid coordinates provided."})
+    else:
+        return JsonResponse({"error": "Method must be POST."}, status=400)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
 
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+def change_location(request):
+    if request.method == "POST":
+        form = MunicipalityForm(request.POST)
+        if form.is_valid():
+            municipality = form.cleaned_data["municipality"]
+            response = redirect("category_list")
+            response.set_cookie("municipality", municipality)
+            return response

@@ -22,6 +22,10 @@ class Municipality(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_municipality_choices(cls):
+        return {i.id: i.name for i in cls.objects.all()}
+
 
 class Target(models.Model):
     name = models.CharField(max_length=255, blank=True)
