@@ -18,14 +18,15 @@
     <title>SortWAI</title>
 </head>
 <body>
-    <div class="container">
+    <div id="landing-screen" class="container">
         <h1 class="brand">Placeholder názov</h1>
 
-        <form action="" class="search">
+        <form action="{% url 'query_request' %}" method="POST" class="search" id="query-form">
+            {% csrf_token %}
             {% if item %}
-                <input type="search" name="q" value="{{ item.product_name }}" class="search__input">
+                <input type="search" name="q" id="user-input" value="{{ item.product_name }}" class="search__input">
             {% else %}
-                <input type="search" name="q" placeholder="Ako triediť...?" class="search__input">
+                <input type="search" name="q" id="user-input" placeholder="Ako triediť...?" class="search__input">
             {% endif %}
             <button class="search__button" type="submit">
                 <iconify-icon icon="mdi:search"></iconify-icon>
@@ -77,6 +78,13 @@
         </div>
 
     </div>
+
+    <div id="result-screen" class="hidden">
+        <p id="response-text"></p>
+        Kokes
+    </div>
+
+
     <script>
         // Get the modal
         var modal = document.getElementById("myModal");
@@ -104,6 +112,54 @@
             }
         }
     </script>
-<script src="{% static 'js/location.js' %}"></script>
+    <script>
+        // Handle submission
+        document.getElementById("query-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const userQuery = document.getElementById("user-input").value;
+            const city = document.getElementById("municipality").innerHTML;
+            console.log(userQuery, city);
+
+            const formData = new FormData(this);
+            formData.append("city", city);
+
+            console.log("Sending AJAX request...");
+
+            transitionToResult();
+
+            fetch (this.action, {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRFToken": this.querySelector("[name=csrfmiddlewaretoken]").value,
+                },
+                body: formData,
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was fucked")
+                }
+                console.log("fuck off cunt")
+                response.json()
+            })
+            .then((data) => {
+                if (data && data.response) {
+                    document.getElementById("response-text").innerText = data.response;
+                } else {
+                    document.getElementById("response-text").innerText = "No response from server.";
+                }
+            })
+            .catch((error) => {
+                console.error("❌ AJAX request failed:", error);
+            });
+        });
+
+        // Transition to result
+        function transitionToResult() {
+            document.getElementById("landing-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.add("visible");
+        }
+    </script>
+    <script src="{% static 'js/location.js' %}"></script>
 </body>
 </html>

@@ -28,6 +28,7 @@ from sortwai.waste.views import (
     change_location,
     get_city,
     get_trash,
+    query_request,
 )
 
 urlpatterns = [
@@ -39,6 +40,7 @@ urlpatterns = [
     path("scanner/<str:code>", get_trash, name="scanner_product"),
     path("get_location/", get_city, name="get_city"),
     path("change_municipality/", change_location, name="change_municipality"),
+    path("query_request/", query_request, name="query_request"),
 ]
 
 if settings.DEBUG:

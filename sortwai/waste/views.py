@@ -1,4 +1,5 @@
 import json
+import requests
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -130,3 +131,20 @@ def change_location(request):
             response = redirect("category_list")
             response.set_cookie("municipality", municipality)
             return response
+
+def query_request(request):
+    print("request called")
+    if request.method == "POST":
+        user_query = request.POST.get("q")
+        city = request.POST.get("city")
+        if not user_query or not city:
+            return JsonResponse({"response": "Missing data!"}, status=400)
+
+        try:
+            req = requests.post("http://localhost:6969", json={"city" : city, "request" : user_query})
+            response_text = req.text
+            print(response_text)
+            return JsonResponse({"response" : response_text})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({"response": "Error connecting to the external service."})
+    return JsonResponse({"response" : "Invalid request."})

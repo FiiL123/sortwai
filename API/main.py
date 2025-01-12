@@ -1,4 +1,4 @@
-from neo4j import GraphDatabase
+# from neo4j import GraphDatabase
 from fastapi import FastAPI
 import requests
 from pydantic import BaseModel
@@ -18,10 +18,10 @@ class City(BaseModel):
 class Request(BaseModel):
     contents: str
 
-@app.get("/")
+@app.get("/hi")
 def getRoot():
     return {"Hello": "There"}
-@app.post("/qnr")
+@app.post("/")
 def getResponse(city: City, request: Request):
     wasteTypes = getWasteTypes()
     chatHeaders = {
@@ -43,9 +43,12 @@ def getResponse(city: City, request: Request):
         "max_tokens": 500
     }
 
-    response = requests.post(API_URL, headers=chatHeaders, json=chatData)
+    # response = requests.post(API_URL, headers=chatHeaders, json=chatData)
+    response = requests.Response() #testing
+    response.status_code = 200
     if response.status_code == 200:
-        response_content = response.json()["choices"][0]["message"]["content"]
+        #response_content = response.json()["choices"][0]["message"]["content"]
+        response_content = "JustForTesting"
         if response_content != "Not found":
             query = getCypherQuery(response_content)
             databaseResponse = queryDatabase(query)
