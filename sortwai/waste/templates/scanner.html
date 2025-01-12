@@ -3,38 +3,13 @@
 {% block content %}
 <script src="{% static 'barcode/html5-qrcode.min.js' %}" type="text/javascript"></script>
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
-<div class="container center-items">
-
-<div id="qr-reader" style="width:100%;"></div>`
+    <a class="search__button" type="submit" href="{% url 'category_list' %}">
+    <iconify-icon icon="mdi:house"></iconify-icon>
+    <span class="search__button_text">Ísť späť</span>
+    </a>
+<div id="qr-reader" style="width:60%;"></div>
 <div id="qr-reader-results"></div>
-</div>
-<script>
-    var resultContainer = document.getElementById('qr-reader-results');
-    var lastResult, countResults = 0;
 
-    async function onScanSuccess(decodedText, decodedResult) {
-        if (decodedText !== lastResult) {
-            ++countResults;
-            lastResult = decodedText;
-            let url = "/scanner/" + decodedText;
-
-            htmx.ajax('GET', url, {
-                    target: '#qr-reader-results', // Replace with the ID of your target container
-                    swap: 'outerHTML'          // Optional: specify the swap strategy
-                });
-
-            console.log(`Scan result ${decodedText}`, decodedResult);
-        }
-    }
-        var scanner = document.getElementById('qr-reader');
-        var screen_w = scanner.offsetWidth/3;
-        var screen_h = scanner.offsetWidth/6;
-        console.log(screen_h)
-        console.log(screen_w)
-        var html5QrcodeScanner = new Html5QrcodeScanner(
-        "qr-reader", { fps: 10, qrbox: {width: screen_w, height: screen_h}});
-    html5QrcodeScanner.render(onScanSuccess);
-</script>
+<script src="{% static 'barcode/scanner.js' %}"></script>
 
 {% endblock content%}

@@ -38,7 +38,11 @@
         </form>
 
         <div class="location_note">
-            Zobrazujeme informácie pre <b id="municipality">Bratislava</b> <a href="#">(zmeniť)</a>
+            {% if municipality %}
+                Zobrazujeme informácie pre <b id="municipality">{{ municipality }}</b> <a id="change_municipality">(zmeniť)</a>
+            {% else %}
+                Vašu lokáciu sa nepodarilo nájsť, <a class="link" id="change_municipality">vyberte manuálne.</a>
+            {% endif %}
         </div>
 
         <div class="tabs">
@@ -60,24 +64,46 @@
         <iconify-icon icon="mdi:chat-question" width="none"></iconify-icon>
     </a>
 
-<script>
+    <div id="myModal" class="modal">
 
-    navigator.geolocation.getCurrentPosition(getCity);
-    async function getCity(position) {
-    fetch('{% url 'get_city' %}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ latitude: position.coords.latitude, longitude: position.coords.longitude }), // Example coordinates for Bratislava
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('City:', data.city);
-            document.getElementById('municipality').innerHTML = data.city;
-        })
-        .catch(error => console.error('Error:', error));
-    }
-</script>
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form method="POST" action="{% url 'change_municipality' %}">
+                {% csrf_token %}
+                {{ municipality_form }}
+                <button type="submit" class="submit">Zmeň</button>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("change_municipality");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on the button, open the modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+<script src="{% static 'js/location.js' %}"></script>
 </body>
 </html>
