@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from langchain_core.documents import Document
 from langchain_experimental.graph_transformers import LLMGraphTransformer
@@ -11,7 +13,7 @@ class DocumentRequest(BaseModel):
 
 
 llm = AzureChatOpenAI(
-    deployment_name="ace-gpt-4o-mini",
+    deployment_name=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
     temperature=0,
 )
 llm_transformer = LLMGraphTransformer(
