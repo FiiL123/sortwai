@@ -1,7 +1,7 @@
 <!doctype html>
-{% load static %}
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.iconify.design/iconify-icon/2.2.0/iconify-icon.min.js"></script>
@@ -80,8 +80,29 @@
     </div>
 
     <div id="result-screen" class="hidden">
+        <button class="back-button">
+            <div class="back-button-box">
+                <span class="back-button-elem">
+                    <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.
+                            9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17
+                            c.5-.5.8-1.1.8-1.9z"
+                        ></path>
+                    </svg>
+                </span>
+                <span class="back-button-elem">
+                    <svg viewBox="0 0 46 40">
+                        <path
+                            d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.
+                            9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17
+                            c.5-.5.8-1.1.8-1.9z"
+                        ></path>
+                    </svg>
+                </span>
+            </div>
+        </button>
         <p id="response-text"></p>
-        Kokes
     </div>
 
 
@@ -139,15 +160,11 @@
                 if (!response.ok) {
                     throw new Error("Network response was fucked")
                 }
-                console.log("fuck off cunt")
-                response.json()
+                return response.json()
             })
             .then((data) => {
-                if (data && data.response) {
-                    document.getElementById("response-text").innerText = data.response;
-                } else {
-                    document.getElementById("response-text").innerText = "No response from server.";
-                }
+                console.log(JSON.stringify(data.response.bin));
+                document.getElementById("response-text").innerText = data.response.bin;
             })
             .catch((error) => {
                 console.error("❌ AJAX request failed:", error);
