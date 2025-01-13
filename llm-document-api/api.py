@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 class DocumentModel(BaseModel):
     name: str
-    city: str
+    municipality: str
     content: str
 
 
@@ -56,14 +56,19 @@ def add_to_graph(request: DocumentRequest):
                 chunk.strip(),
                 metadata={
                     "name": document.name,
-                    "city": document.city,
+                    "municipality": document.municipality,
                     "chunk_number": n,
                 },
             )
             for n, chunk in enumerate(document.content.split("---"))
         ]
     else:
-        chunks = [Document(document.content.strip(), metadata={"name": document.name})]
+        chunks = [
+            Document(
+                document.content.strip(),
+                metadata={"name": document.name, "municipality": document.municipality},
+            )
+        ]
     graph_documents = llm_transformer.convert_to_graph_documents(chunks)
     graph.add_graph_documents(graph_documents, include_source=True)
     return {"graph_documents": graph_documents}
