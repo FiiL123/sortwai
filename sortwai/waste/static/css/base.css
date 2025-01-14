@@ -412,11 +412,15 @@ iconify-icon {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     border-radius: 12px;
 }
 
 .modal-content form {
     text-align: center;
+=======
+    border-radius: 25px;
+>>>>>>> 64780b2469879916f23571bc6883aa6d4d03bb79
 =======
     border-radius: 25px;
 >>>>>>> 64780b2469879916f23571bc6883aa6d4d03bb79
@@ -576,6 +580,7 @@ body {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #response-text {
     margin-top: 80px;
     text-align: center;
@@ -583,6 +588,9 @@ body {
     color: #333;
     color: white;
 }
+=======
+
+>>>>>>> 64780b2469879916f23571bc6883aa6d4d03bb79
 =======
 
 >>>>>>> 64780b2469879916f23571bc6883aa6d4d03bb79
