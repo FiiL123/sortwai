@@ -146,8 +146,10 @@ def query_request(request):
             return JsonResponse({"response": "Missing data!"}, status=400)
 
         try:
-            req = requests.post("http://localhost:6969", json={"city" : city, "request" : user_query})
-            response_text = req.text
+            req = requests.post("http://api:6969", json={"city":{"name": city},
+                                                            "request": {"contents": user_query}
+                                                            })
+            response_text = req.json()
             print(response_text)
             return JsonResponse({"response" : response_text})
         except requests.exceptions.RequestException as e:

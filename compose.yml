@@ -30,7 +30,7 @@ services:
   api:
     build:
       context: .
-    command: "poetry run fastapi dev ./API/main.py --port 6969"
+    command: "poetry run fastapi run ./API/main.py --port 6969"
     ports:
       - "6969:6969"
 volumes:
