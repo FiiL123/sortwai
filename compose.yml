@@ -33,5 +33,18 @@ services:
     command: "poetry run fastapi run ./API/main.py --port 6969"
     ports:
       - "6969:6969"
+    env_file:
+      - api.env
+    
+  llm-document-api:
+    build:
+      context: .
+      target: llm-document-api
+    ports:
+      - "8001:8000"
+    env_file:
+      - api.env
+
+
 volumes:
   postgres_data:
