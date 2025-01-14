@@ -19,7 +19,12 @@
 </head>
 <body>
     <div id="landing-screen" class="container">
-        <h1 class="brand">Placeholder názov</h1>
+        <div class="flex-container">
+            <div class="brand">
+                <img src="{% static '/images/recycle-symbol.png' %}" alt="Brand Logo" class="brand_logo" >
+                <h1 class="brand_name">SortWAI</h1>
+            </div>
+        </div>
 
         <form action="{% url 'query_request' %}" method="POST" class="search" id="query-form">
             {% csrf_token %}

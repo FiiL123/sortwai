@@ -31,12 +31,56 @@
     margin: 0 auto;
 }
 
-.brand {
-    text-align: center;
+.brand_name {
     color: var(--primary-dark);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     font-size: 2.5rem;
 }
+
+.brand_logo {
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.qr-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#qr-reader {
+    width: 50%;
+    aspect-ratio: 1;
+    border: none;
+}
+
+#qr-reader-results {
+    width: 50%;
+    text-align: center;
+}
+
+
+.flex-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width= 100%;
+    gap: 1rem;
+
+}
+
 
 .search {
     display: flex;
@@ -80,6 +124,27 @@
         display: inline;
     }
 }
+
+
+.back__button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--primary-dark);
+    font-size: 1rem;
+
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--primary);
+    color: var(--primary-text);
+    text-decoration: none;
+
+    &:hover {
+        background: var(--primary-dark);
+    }
+}
+
 
 .location_note {
     color: var(--gray-dark);
@@ -332,6 +397,8 @@ iconify-icon {
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
 }
 
 .close {
@@ -347,14 +414,6 @@ iconify-icon {
     text-decoration: none;
     cursor: pointer;
 }
-
-
-
-
-
-
-
-
 
 /* Kokes */
 body {
@@ -389,3 +448,5 @@ body {
     visibility: visible;
     transform: translateY(0);
 }
+
+
