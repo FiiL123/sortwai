@@ -44,10 +44,18 @@ def getResponse(city: City, request: Request):
             Make the **first letter** after a **space** or an **_** capital. 
             
             EXAMPLES:
-            Male_Kusy_Konárov -> Male_Kusy_Konárov
-            Patik -> Male_Kusy_Konárov
-            Čaj -> Sypané Čaje
-            Podrvené Orechové Škrupinky -> Podrvené Orechové Škrupinky
+            Input: Male_Kusy_Konárov 
+            Output: Male_Kusy_Konárov
+            
+            Input:Patik 
+            Output:Male_Kusy_Konárov
+            
+            Input:Čaj
+            Output:Sypané Čaje
+            
+            Input:Podrvené Orechové Škrupinky
+            Output:Podrvené Orechové Škrupinky
+            
              """},
             {"role": "user", "content": request.contents}
         ],

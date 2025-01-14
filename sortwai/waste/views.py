@@ -5,6 +5,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
+from django.urls import reverse
+
 from geopy import Nominatim
 
 from sortwai.waste.forms import MunicipalityForm
@@ -72,7 +74,10 @@ class LocationListView(ListView):
 
 class ScannerView(TemplateView):
     template_name = "scanner.html"
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['back_url'] = reverse('category_list')
+        return context
 
 def get_trash(request, code):
     # item = get_object_or_404(BarCode, code=code)
