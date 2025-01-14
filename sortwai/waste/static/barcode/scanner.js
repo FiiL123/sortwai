@@ -16,8 +16,8 @@ async function onScanSuccess(decodedText, decodedResult) {
     }
 }
 var scanner = document.getElementById('qr-reader');
-var screen_w = scanner.offsetWidth/3;
-var screen_h = scanner.offsetWidth/6;
+var screen_w = scanner.offsetWidth/2;
+var screen_h = scanner.offsetWidth/4;
 console.log(screen_h)
 console.log(screen_w)
 var html5QrcodeScanner = new Html5QrcodeScanner(
