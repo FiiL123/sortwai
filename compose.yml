@@ -30,11 +30,13 @@ services:
   api:
     build:
       context: .
+      target: web
     command: "poetry run fastapi run ./API/main.py --port 6969"
     ports:
       - "6969:6969"
     env_file:
       - api.env
+
     
   llm-document-api:
     build:
