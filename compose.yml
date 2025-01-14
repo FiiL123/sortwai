@@ -27,6 +27,15 @@ services:
       - db
     command: "/app/entrypoint.sh dev"
 
+  api:
+    build:
+      context: .
+    command: "poetry run fastapi run ./API/main.py --port 6969"
+    ports:
+      - "6969:6969"
+    env_file:
+      - api.env
+    
   llm-document-api:
     build:
       context: .
@@ -34,7 +43,7 @@ services:
     ports:
       - "8001:8000"
     env_file:
-      - llm-document-api/.env
+      - api.env
 
 
 volumes:

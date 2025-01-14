@@ -7,6 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get -y upgrade \
     && apt-get -y clean \
+    && apt-get install -y curl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade poetry

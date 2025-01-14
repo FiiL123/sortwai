@@ -1,9 +1,12 @@
 import json
+import requests
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
+from django.urls import reverse
+
 from geopy import Nominatim
 
 from sortwai.waste.forms import MunicipalityForm
@@ -71,7 +74,10 @@ class LocationListView(ListView):
 
 class ScannerView(TemplateView):
     template_name = "scanner.html"
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['back_url'] = reverse('category_list')
+        return context
 
 def get_trash(request, code):
     # item = get_object_or_404(BarCode, code=code)
@@ -130,3 +136,22 @@ def change_location(request):
             response = redirect("category_list")
             response.set_cookie("municipality", municipality)
             return response
+
+def query_request(request):
+    print("request called")
+    if request.method == "POST":
+        user_query = request.POST.get("q")
+        city = request.POST.get("city")
+        if not user_query or not city:
+            return JsonResponse({"response": "Missing data!"}, status=400)
+
+        try:
+            req = requests.post("http://api:6969", json={"city":{"name": city},
+                                                            "request": {"contents": user_query}
+                                                            })
+            response_text = req.json()
+            print(response_text)
+            return JsonResponse({"response" : response_text})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({"response": "Error connecting to the external service."})
+    return JsonResponse({"response" : "Invalid request."})

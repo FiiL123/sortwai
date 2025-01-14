@@ -51,4 +51,16 @@
     </div>
 {% endfor %}
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".card");
+
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add("fade-in");
+        }, index * 300);
+    });
+});
+</script>
+
 {% endblock %}
