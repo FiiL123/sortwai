@@ -176,6 +176,18 @@
             document.getElementById("landing-screen").classList.add("hidden");
             document.getElementById("result-screen").classList.add("visible");
         }
+
+        // Handle back button click
+        document.querySelector(".back-button").addEventListener("click", function () {
+            document.getElementById("landing-screen").classList.remove("hidden");
+            const resultScreen = document.getElementById("result-screen");
+
+            resultScreen.classList.add("slide-down");
+
+            setTimeout(() => {
+                resultScreen.classList.remove("visible", "slide-down");
+            }, 500);
+        });
     </script>
     <script src="{% static 'js/location.js' %}"></script>
 </body>

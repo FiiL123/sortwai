@@ -10,7 +10,7 @@ app = FastAPI()
 API_URL = ...
 API_KEY = ...
 DATABASE_URL = ...
-AUTH = ...
+AUTH = ... #database details ("database_name", "password")
 
 
 class City(BaseModel):
@@ -39,55 +39,15 @@ def getResponse(city: City, request: Request):
             {"role": "system",
              "content": """
              ##TASK##
-            You are a waste classification expert specializing in recycling. Your role is to classify waste items provided by the user into one of the predefined categories listed above. Use logical deduction, common knowledge about waste materials, and the user's provided information to determine the correct category. 
-            First of all, check whether the user input is not in the dedicated list. If yes, return the category name from the list only.
-            ### Detailed Guidelines:
+            You are a recycling expert. Try to fit the user given item into one of the categories from the given list.
+            You must output the exact name of the category as we use it for fulltext search. 
+            Make the **first letter** after a **space** or an **_** capital. 
             
-            1. **Analyze the Description**:
-               - The waste item's description is provided in **Slovak language**. It may or may not include proper diacritics.
-               - Examine the waste item's description for keywords or phrases that suggest:
-                 - **Material type**: e.g., plast, papier, sklo, kov.
-                 - **Condition**: čistý, kontaminovaný, mastný, použitý.
-                 - **Function or usage**: e.g., obal, nádoba, kelímok.
-               - Infer additional characteristics logically based on the item's described use. For example:
-                 - If the user mentions "milk carton" recognize it as packaging for a liquid and infer that it might be clean or contaminated.
-                 - If the user mentions "oil-stained paper" classify it as contaminated paper.
-            
-            2. **Determine the Most Appropriate Category**:
-               - Match the waste item to the most specific and relevant category from the predefined list based on:
-                 - Its primary material (e.g., plast, papier, sklo, kov).
-                 - Its function or usage (e.g., obal, nádoba, položka na jedno použitie).
-                 - Typical recycling practices and known properties of the material.                 
-                 - Items that are **industrial, large-scale, or structural** in nature (e.g., "autovraky," "oceľový odpad," "elektroodpad") should be classified accordingly
-                 - If the item could belong to multiple categories, choose the category that aligns most closely with its main material or intended use.
-                 - If the predefined list contains the waste item, then return it
-                 
-            3. **Inference from Context**:
-               - Look for contextual clues in the description that suggest additional details:
-                 - If the item is described as "obal" consider what the packaging was used for (e.g., food, cosmetics, chemicals) to determine whether it might be contaminated.
-                 - If the description mentions "nevratná sklenená fľaša" infer that it is recyclable glass but does not require a deposit refund.
-            
-            4. **Handle Composite or Mixed Materials**:
-               - If the item is made from multiple materials (e.g., tetrapak, hliník s plastom), classify it based on the dominant recyclable component.
-               - If no single material dominates, classify it as non-recyclable or a composite material.
-            
-            5. **Handle Ambiguities**:
-               - If the description is too vague or lacks sufficient detail to classify confidently, respond with:
-                 "Neviem presne určiť kategóriu odpadu."
-               - Avoid guessing or assuming characteristics not explicitly described or logically inferred.
-                 
-            6. **Output Format**:
-               - Return only the category name (predefined categories listed above) if a match is found.
-               - For ambiguous descriptions, return:
-                 "Neviem presne určiť kategóriu odpadu."
-               - For non-recyclable items, return:
-                 "Odpad nepatrí do recyklovateľných kategórií."
-
-            
-            ### Assumptions to Guide Your Classification:
-            - Assume that common household waste items are described accurately unless explicitly stated otherwise.
-            - Apply logical deduction to make reasonable assumptions about the waste based on its usage and context (e.g., "nádoba" likely held something liquid or solid).
-            - Do not request additional clarification or details from the user; rely solely on the given information and recycling principles.
+            EXAMPLES:
+            Male_Kusy_Konárov -> Male_Kusy_Konárov
+            Patik -> Male_Kusy_Konárov
+            Čaj -> Sypané Čaje
+            Podrvené Orechové Škrupinky -> Podrvené Orechové Škrupinky
              """},
             {"role": "user", "content": request.contents}
         ],
@@ -101,13 +61,16 @@ def getResponse(city: City, request: Request):
     # response.status_code = 200 #testing
     if response.status_code == 200:
         response_content = response.json()["choices"][0]["message"]["content"]
-        response_content = response_content.strip().capitalize()
+        response_content = response_content.strip()
         print(response_content)
         #response_content = request.contents
         if response_content == "Neviem presne určiť kategóriu odpadu." or response_content == "Odpad nepatrí do recyklovateľných kategórií.":
             return JSONResponse({"bin": response_content})
         else:
             result = getBinFromQuery(response_content, city.name)
+            print(result)
+            if result == "Error":
+                return JSONResponse({"bin": "Chýba kôš: "+response_content})
             return JSONResponse({"bin": result})
 
     else:
