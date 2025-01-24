@@ -143,3 +143,6 @@ MEDIA_ROOT = BASE_DIR / "uploads"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
+
+
+SORTWAI_LLM_API = "http://llm-document-api:8000"
