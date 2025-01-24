@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <link rel="stylesheet" href="{% static 'app.css' %}">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <title>SortWAI</title>
 </head>
 <body>
@@ -138,16 +139,16 @@
     </script>
     <script>
         // Handle submission
+        var resultContainer = document.getElementById('categories');
         document.getElementById("query-form").addEventListener("submit", function (event) {
             event.preventDefault();
             const userQuery = document.getElementById("user-input").value;
-            const city = document.getElementById("municipality").innerHTML;
-            console.log(userQuery, city);
-
-            const formData = new FormData(this);
-            formData.append("city", city);
-
-            console.log("Sending AJAX request...");
+            let query = `/query_request/?q=${userQuery}`;
+            htmx.ajax('POST', query, {
+                target: '#categories',
+                swap: 'outerHTML'
+            });
+            /*console.log("Sending AJAX request...");
 
             transitionToResult();
 
@@ -171,11 +172,11 @@
             })
             .catch((error) => {
                 console.error("❌ AJAX request failed:", error);
-            });
+            });*/
         });
 
         // Transition to result
-        function transitionToResult() {
+        /*function transitionToResult() {
             document.getElementById("landing-screen").classList.add("hidden");
             document.getElementById("result-screen").classList.add("visible");
         }
@@ -190,7 +191,7 @@
             setTimeout(() => {
                 resultScreen.classList.remove("visible", "slide-down");
             }, 500);
-        });
+        });*/
     </script>
     <script src="{% static 'js/location.js' %}"></script>
 </body>
