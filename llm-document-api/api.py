@@ -93,6 +93,11 @@ def list_categories(
 ) -> list[Category]:
     filter = ""
     params = {}
+    if municipality and document:
+        raise HTTPException(
+            status_code=422,
+            detail="Filtering by municipality and document at the same time is not supported.",
+        )
     if municipality:
         filter = "{municipality: $municipality}"
         params["municipality"] = municipality
