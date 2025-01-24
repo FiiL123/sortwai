@@ -74,8 +74,8 @@ def create_objects_from_document(document_id: str, municipality_id: int):
             category_object = Category.objects.create(
                 municipality_id=municipality_id,
                 name=category["id"],
-                do="\n".join(category_detail["waste_ok"]),
-                dont="\n".join(category_detail["waste_not"]),
+                do=do,
+                dont=dont,
                 target=target,
             )
 
