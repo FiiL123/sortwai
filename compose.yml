@@ -58,8 +58,6 @@ services:
     image: bitnami/neo4j
     volumes:
       - neo4j_data:/data
-    environment:
-      - NEO4J_AUTH=none
     ports:
       - "7474:7474"
       - "7687:7687"
