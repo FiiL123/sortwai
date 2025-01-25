@@ -1,0 +1,11 @@
+{% extends 'operator_base.html' %}
+{% block main %}
+    <h2 class="title">Dokumenty odpadového hospodárstva</h2>
+    <ul>
+        {% for object in object_list %}
+            <li>
+                <a>{{ object.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock main %}

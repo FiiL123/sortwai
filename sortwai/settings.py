@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django_probes",
     "sortwai.users",
     "sortwai.waste",
+    "sortwai.operator",
 ]
 
 MIDDLEWARE = [
