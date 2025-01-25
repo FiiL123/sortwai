@@ -1,6 +1,3 @@
-{% extends "base.html" %}
-
-{% block body %}
 <div id = "categories">
 {% for object in object_list %}
     <div class="card card--category fade-in">
@@ -51,16 +48,3 @@
     </div>
 {% endfor %}
 </div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const cards = document.querySelectorAll(".card");
-
-    cards.forEach((card, index) => {
-        setTimeout(() => {
-            card.classList.add("fade-in");
-        }, index * 300);
-    });
-});
-</script>
-
-{% endblock %}

@@ -2,7 +2,8 @@ import json
 import requests
 
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
 from django.urls import reverse
@@ -137,21 +138,26 @@ def change_location(request):
             response.set_cookie("municipality", municipality)
             return response
 
+@csrf_exempt
 def query_request(request):
-    print("request called")
     if request.method == "POST":
+        print("request called")
         user_query = request.POST.get("q")
-        city = request.POST.get("city")
-        if not user_query or not city:
-            return JsonResponse({"response": "Missing data!"}, status=400)
-
-        try:
-            req = requests.post("http://api:6969", json={"city":{"name": city},
-                                                            "request": {"contents": user_query}
-                                                            })
-            response_text = req.json()
-            print(response_text)
-            return JsonResponse({"response" : response_text})
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({"response": "Error connecting to the external service."})
-    return JsonResponse({"response" : "Invalid request."})
+        city = get_city(request)
+        response = {"id": 2, "name": "Papierovy papier"}
+        category = get_object_or_404(Category, id=response.get("id"))
+        print(category)
+        return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+    #     if not user_query or not city:
+    #         return JsonResponse({"response": "Missing data!"}, status=400)
+    #
+    #     try:
+    #         req = requests.post("http://api:6969", json={"city":{"name": city},
+    #                                                         "request": {"contents": user_query}
+    #                                                         })
+    #         response_text = req.json()
+    #         print(response_text)
+    #         return JsonResponse({"response" : response_text})
+    #     except requests.exceptions.RequestException as e:
+    #         return JsonResponse({"response": "Error connecting to the external service."})
+    # return JsonResponse({"response" : "Invalid request."})
