@@ -4,11 +4,12 @@ from django.views.generic import CreateView, ListView
 
 from sortwai.waste.models import Document, Category
 from sortwai.waste.views import get_active_municipality
+from sortwai.waste.document import import_document, create_objects_from_document
 
 
 class DocumentCreateView(CreateView):
     model = Document
-    fields = ['name', 'file']
+    fields = ['name', 'text']
     template_name = 'document_form.html'
     success_url = 'operator:document_list'
 
@@ -20,7 +21,10 @@ class DocumentCreateView(CreateView):
         if not municipality:
             raise ValueError("No active municipality found!")
         form.instance.municipality = municipality
-        return super().form_valid(form)
+        resp =  super().form_valid(form)
+        upload = import_document(form.instance.id)
+        create_objects_from_document(form.instance.name, municipality.id)
+        return resp
 class DocumentListView(ListView):
     model = Document
     template_name = 'document_list.html'

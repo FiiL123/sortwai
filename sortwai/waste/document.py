@@ -1,9 +1,10 @@
+import json
 from urllib.parse import urljoin
 
 import requests
 from django.conf import settings
 
-from sortwai.waste.models import Category, Target
+from sortwai.waste.models import Category, Target, Document, Municipality
 
 
 def get_categories_by_document(document_id: str) -> list[dict]:
@@ -41,20 +42,21 @@ def _set_category_frontend_id(category_id: str, frontend_id: str) -> None:
 
 def create_objects_from_document(document_id: str, municipality_id: int):
     categories = get_categories_by_document(document_id)
-
+    print(categories)
     for category in categories:
         if category["frontend_id"]:
+            print("CATEGORY HAS FRONTEND ID")
             continue
 
         category_detail = get_category(category["id"])
+        print(category_detail)
         if not category_detail["bins"]:
             # TODO: log error
+            print("CATEGORY HAS NO BINS")
             continue
 
-        do = ("\n".join([w.lower().capitalize() for w in category_detail["waste_ok"]]),)
-        dont = (
-            "\n".join([w.lower().capitalize() for w in category_detail["waste_not"]]),
-        )
+        do = "\n".join([w.lower().capitalize() for w in category_detail["waste_ok"]])
+        dont = "\n".join([w.lower().capitalize() for w in category_detail["waste_not"]])
 
         category_object = Category.objects.filter(
             municipality_id=municipality_id, name=category["id"]
@@ -80,3 +82,21 @@ def create_objects_from_document(document_id: str, municipality_id: int):
             )
 
         _set_category_frontend_id(category["id"], str(category_object.id))
+
+def import_document(document_id: int):
+    document = Document.objects.get(id=document_id)
+    data = {
+        "document": {
+            "name": document.name,
+            "municipality": document.municipality.name,
+            "content": document.text.replace("\r\n", " "),
+        },
+        "split_into_chunks": True
+    }
+    res = requests.post(
+        urljoin(settings.SORTWAI_LLM_API, "/import-document"),
+        data=json.dumps(data),
+    )
+    res.raise_for_status()
+
+    return res.json()

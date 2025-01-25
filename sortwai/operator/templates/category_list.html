@@ -1,5 +1,8 @@
 {% extends 'true_base.html' %}
 {% block content %}
+    <a href="{% url 'operator:document_create' %}">CREATE DOCUMENT</a>
+    <a href="{% url 'operator:document_list' %}">LIST DOCUMENTS</a>
+    <a href="{% url 'operator:category_list' %}">LIST CATEGOREIS</a>
 {% for object in object_list %}
     <div class="card card--category fade-in">
         <div class="card__content">
