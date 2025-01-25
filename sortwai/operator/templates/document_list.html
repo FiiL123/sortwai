@@ -1,9 +1,6 @@
-{% extends 'true_base.html' %}
+{% extends 'operator_base.html' %}
 {% block content %}
     <h2 class="title">Dokumenty odpadového hospodárstva</h2>
-    <a href="{% url 'operator:document_create' %}">CREATE DOCUMENT</a>
-    <a href="{% url 'operator:document_list' %}">LIST DOCUMENTS</a>
-    <a href="{% url 'operator:category_list' %}">LIST CATEGOREIS</a>
     <ul>
         {% for object in object_list %}
             <li>
