@@ -1,8 +1,8 @@
 {% extends 'operator_base.html' %}
-{% block content %}
+{% block main %}
     <form action="{% url 'operator:document_create' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="Submit">
     </form>
-{% endblock content %}
+{% endblock main %}
