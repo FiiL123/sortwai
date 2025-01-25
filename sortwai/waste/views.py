@@ -14,7 +14,7 @@ from sortwai.waste.forms import MunicipalityForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
 
-def get_active_municipality(request):
+def get_active_municipality(request) -> Municipality|None:
     if city := request.COOKIES.get("municipality"):
         municipality = Municipality.objects.filter(id=city)
         if municipality.exists():
@@ -142,22 +142,28 @@ def change_location(request):
 def query_request(request):
     if request.method == "POST":
         print("request called")
+        print(request.POST)
         user_query = request.POST.get("q")
-        city = get_city(request)
-        response = {"id": 2, "name": "Papierovy papier"}
-        category = get_object_or_404(Category, id=response.get("id"))
-        print(category)
-        return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
-    #     if not user_query or not city:
-    #         return JsonResponse({"response": "Missing data!"}, status=400)
-    #
-    #     try:
-    #         req = requests.post("http://api:6969", json={"city":{"name": city},
-    #                                                         "request": {"contents": user_query}
-    #                                                         })
-    #         response_text = req.json()
-    #         print(response_text)
-    #         return JsonResponse({"response" : response_text})
-    #     except requests.exceptions.RequestException as e:
-    #         return JsonResponse({"response": "Error connecting to the external service."})
-    # return JsonResponse({"response" : "Invalid request."})
+        city = get_active_municipality(request).name
+        print(user_query)
+        print(city)
+        # response = {"id": 5, "name": "Papierovy papier"}
+        # category = get_object_or_404(Category, id=response.get("id"))
+        # print(category)
+        # return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+
+        if not user_query or not city:
+            return HttpResponse("MISSING DATA")
+
+        try:
+            req = requests.post("http://api:6969", json={"city":{"name": city},
+                                                            "request": {"contents": user_query}
+                                                            })
+            response_text = req.json()
+            print("resp", response_text)
+            category = get_object_or_404(Category, id=response_text.get("id"))
+            print(category)
+            return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({"response": "Error connecting to the external service."})
+    return JsonResponse({"response" : "Invalid request."})
