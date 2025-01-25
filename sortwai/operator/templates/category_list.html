@@ -1,0 +1,42 @@
+{% extends 'operator_base.html' %}
+{% block main %}
+{% for object in object_list %}
+    <div class="card card--category fade-in">
+        <div class="card__content">
+            <h2 class="card__title">{{ object.name }}</h2>
+            {{ object.description|linebreaks }}
+
+            <div class="waste_detail">
+                {% if object.do %}
+                    <ul class="waste_detail__item waste_detail__item--do">
+                        {% for do in object.do.splitlines %}
+                            <li>
+                                <iconify-icon icon="mdi:check-circle-outline"></iconify-icon>
+                                {{ do }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if object.dont %}
+                    <ul class="waste_detail__item waste_detail__item--dont">
+                        {% for dont in object.dont.splitlines %}
+                            <li>
+                                <iconify-icon icon="mdi:close-circle-outline"></iconify-icon>
+                                {{ dont }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="waste_destination">
+                <iconify-icon class="waste_destination__arrow" icon="mdi:arrow-right"></iconify-icon>
+                <div class="waste_destination__name waste_destination__name--{{ object.target.color }}">
+                    {{ object.target.name }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock main %}

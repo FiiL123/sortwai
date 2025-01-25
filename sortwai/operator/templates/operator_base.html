@@ -1,0 +1,10 @@
+{% extends 'true_base.html' %}
+    {% block content %}
+    <div class="container">
+    <a href="{% url 'operator:document_create' %}">CREATE DOCUMENT</a>
+    <a href="{% url 'operator:document_list' %}">LIST DOCUMENTS</a>
+    <a href="{% url 'operator:category_list' %}">LIST CATEGOREIS</a>
+    {% block main %}
+    {% endblock main %}
+    {% endblock content %}
+    </div>

@@ -18,7 +18,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from sortwai.waste.views import (
     CategoryListView,
@@ -41,6 +41,7 @@ urlpatterns = [
     path("get_location/", get_city, name="get_city"),
     path("change_municipality/", change_location, name="change_municipality"),
     path("query_request/", query_request, name="query_request"),
+    path("operator/", include("sortwai.operator.urls")),
 ]
 
 if settings.DEBUG:
