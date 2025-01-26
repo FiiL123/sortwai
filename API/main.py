@@ -95,13 +95,13 @@ def getResponse(city: City, request: Request):
             print(result)
             if result == "Error":
                 return JSONResponse({"bin": "Chýba kôš: " + response_content})
-            return JSONResponse({"bin": result})
+            return JSONResponse({"bin": result[0], "id": result[1]})
 
     else:
         print(f"Error {response.status_code}: {response.text}")
         return None
 
-    return {"Hello": "World"}
+    return {"Oops": "Wrong site"}
 
 
 def getBinFromQuery(waste: str, city: str):
@@ -110,16 +110,17 @@ def getBinFromQuery(waste: str, city: str):
                 WHERE w.id = "{waste}"
                 WITH c
                 Match (c:Category)-[:BELONGS_IN]->(b:Bin)
-                WITH b
+                WITH b, c
                 MATCH (d:Document)-[:MENTIONS]->(w:Waste)
                 WHERE d.municipality = "{city}"
-                RETURN DISTINCT b"""
+                RETURN DISTINCT b, c.frontend_id"""
     with GraphDatabase.driver(DATABASE_URL, auth=AUTH) as driver:
         databaseResponse = driver.execute_query(query)
         print(databaseResponse)
         resultBin = "Error"
         for record in databaseResponse.records:
             node = record["b"]
+            feId = record["c.frontend_id"]
             if node is not None:
                 resultBin = node["id"]
                 print(resultBin)
@@ -127,7 +128,7 @@ def getBinFromQuery(waste: str, city: str):
                 resultBin = "None"
                 print("Node 'b' is None.")
         print("Returning Query")
-        return resultBin
+        return resultBin, feId
 
 
 def getWasteTypes():
