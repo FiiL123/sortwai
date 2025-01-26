@@ -42,6 +42,6 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
-COPY --chown=appuser:appuser llm-document-api/api.py ./
+COPY --chown=appuser:appuser llm-document-api/main.py ./
 
-CMD ["poetry", "run", "fastapi", "run", "/app/api.py"]
+CMD ["poetry", "run", "fastapi", "run", "/app/main.py"]
