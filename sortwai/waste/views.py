@@ -1,9 +1,11 @@
 import json
+from unicodedata import category
+from urllib.parse import urlparse
+
 import requests
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
-from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
 from django.urls import reverse
@@ -58,6 +60,12 @@ class DocumentListView(ListView):
             municipality=get_active_municipality(self.request)
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        municipality_form = MunicipalityForm()
+        context["municipality_form"] = municipality_form
+        return context
+
 
 class LocationListView(ListView):
     template_name = "locations.html"
@@ -69,6 +77,10 @@ class LocationListView(ListView):
 
     def get_context_data(self, *, object_list=..., **kwargs):
         ctx = super(LocationListView, self).get_context_data(**kwargs)
+
+        municipality_form = MunicipalityForm()
+        ctx["municipality_form"] = municipality_form
+
         ctx["map_pins"] = list(self.get_queryset().values_list("gps_lat", "gps_lon"))
         return ctx
 
@@ -134,36 +146,89 @@ def change_location(request):
         form = MunicipalityForm(request.POST)
         if form.is_valid():
             municipality = form.cleaned_data["municipality"]
-            response = redirect("category_list")
+            referer = request.META.get("HTTP_REFERER")
+            if referer:
+                referer_path = urlparse(referer).path
+
+                allowed_paths = [
+                    reverse("category_list"),
+                    reverse("document_list"),
+                    reverse("location_list"),
+                ]
+                if referer_path in allowed_paths:
+                    response = redirect(referer_path)
+                else:
+                    # default
+                    response = redirect("category_list")
+            else:
+                # default
+                response = redirect("category_list")
+
             response.set_cookie("municipality", municipality)
             return response
 
-@csrf_exempt
+# @csrf_exempt
+# def query_request2(request):
+#     if request.method == "POST":
+#         print("request called")
+#         print(request.POST)
+#         user_query = request.POST.get("q")
+#         city = get_active_municipality(request).name
+#         print(user_query)
+#         print(city)
+#         # response = {"id": 5, "name": "Papierovy papier"}
+#         # category = get_object_or_404(Category, id=response.get("id"))
+#         # print(category)
+#         # return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+#
+#         if not user_query or not city:
+#             return HttpResponse("MISSING DATA")
+#
+#         try:
+#             req = requests.post("http://api:6969", json={"city":{"name": city},
+#                                                             "request": {"contents": user_query}
+#                                                             })
+#             response_text = req.json()
+#             print("resp", response_text)
+#             category = get_object_or_404(Category, id=response_text.get("id"))
+#             print(category)
+#             return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+#         except requests.exceptions.RequestException as e:
+#             return JsonResponse({"response": "Error connecting to the external service."})
+#     return JsonResponse({"response" : "Invalid request."})
+
+
 def query_request(request):
     if request.method == "POST":
-        print("request called")
-        print(request.POST)
         user_query = request.POST.get("q")
-        city = get_active_municipality(request).name
-        print(user_query)
-        print(city)
-        # response = {"id": 5, "name": "Papierovy papier"}
-        # category = get_object_or_404(Category, id=response.get("id"))
-        # print(category)
-        # return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+        city = request.POST.get("city")
 
         if not user_query or not city:
-            return HttpResponse("MISSING DATA")
-
+            return JsonResponse({"response": "Missing data!"}, status=400)
         try:
             req = requests.post("http://api:6969", json={"city":{"name": city},
                                                             "request": {"contents": user_query}
                                                             })
             response_text = req.json()
-            print("resp", response_text)
-            category = get_object_or_404(Category, id=response_text.get("id"))
-            print(category)
-            return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
+            category = get_object_or_404(Category, id = response_text["response"][0]["id"])
+
+            def limit_lines_to_list(text, max_lines=5):
+                lines = text.splitlines()
+                if len(lines) > max_lines:
+                    lines = lines[:max_lines] + ["..."]
+                return lines
+
+            limited_do = limit_lines_to_list(category.do or "")
+            limited_dont = limit_lines_to_list(category.dont or "")
+
+            category_data = {
+                "name": category.name,
+                "image": category.image.url if category.image else None,
+                "do": limited_do,
+                "dont": limited_dont,
+                "description": category.description
+            }
+            return JsonResponse({"response": response_text["response"][0], "category": category_data})
         except requests.exceptions.RequestException as e:
             return JsonResponse({"response": "Error connecting to the external service."})
     return JsonResponse({"response" : "Invalid request."})
