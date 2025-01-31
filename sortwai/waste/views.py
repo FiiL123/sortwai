@@ -57,7 +57,8 @@ class DocumentListView(ListView):
 
     def get_queryset(self):
         return Document.objects.filter(
-            municipality=get_active_municipality(self.request)
+            municipality=get_active_municipality(self.request),
+            
         )
 
     def get_context_data(self, **kwargs):
@@ -210,6 +211,7 @@ def query_request(request):
                                                             "request": {"contents": user_query}
                                                             })
             response_text = req.json()
+            print(response_text)
             category = get_object_or_404(Category, id = response_text["response"][0]["id"])
 
             def limit_lines_to_list(text, max_lines=5):

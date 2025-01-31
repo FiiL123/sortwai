@@ -64,7 +64,7 @@
     text-decoration: none;
     color: var(--primary-dark);
     font-size: 1rem;
-
+    margin: 2em;
     border-radius: 0.5rem;
     padding: 0.5rem 0.75rem;
     background: var(--primary);
