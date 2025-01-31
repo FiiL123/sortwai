@@ -16,16 +16,12 @@ services:
       target: web
     ports:
       - "8000:8000"
-    volumes:
-      - ./:/app/
     environment:
-      - DEBUG=True
       - DATABASE_URL=psql://postgres:postgres@db/postgres
     env_file:
       - .env
     depends_on:
       - db
-    command: "/app/entrypoint.sh dev"
 
   api:
     build:
@@ -41,7 +37,9 @@ services:
     env_file:
       - api.env
     depends_on:
-      - neo4j
+      neo4j:
+        condition: service_healthy
+        restart: true
 
   llm-document-api:
     build:
@@ -56,7 +54,9 @@ services:
     env_file:
       - api.env
     depends_on:
-      - neo4j
+      neo4j:
+        condition: service_healthy
+        restart: true
   neo4j:
     image: bitnami/neo4j
     volumes:
@@ -64,6 +64,13 @@ services:
     ports:
       - "7474:7474"
       - "7687:7687"
+    healthcheck:
+      test: [ "CMD", "neo4j", "status" ]
+      start_period: 30s
+      start_interval: 3s
+      interval: 10s
+      retries: 5
+
 
 volumes:
   postgres_data:
