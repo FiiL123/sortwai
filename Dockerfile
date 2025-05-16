@@ -7,7 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get -y upgrade \
     && apt-get -y clean \
-    && apt-get install -y curl \
+    && apt-get install -y curl libzbar0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
