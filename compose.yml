@@ -41,6 +41,16 @@ services:
         condition: service_healthy
         restart: true
 
+  barcode:
+    build:
+      context: .
+      target: web
+    command: "poetry run fastapi run ./barcode-service/api.py --port 8000"
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./:/app
+
   llm-document-api:
     build:
       context: .
