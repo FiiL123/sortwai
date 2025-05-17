@@ -1,15 +1,31 @@
+import json
 import typing
 
 class SearchServiceProxy:
-    def search(self, context: 'BarcodeCO'):
-        pass
+    def search(self, context: list['BarcodeCO']):
+        # request search service
+        return {"message": "Do kosa.. nejaky si proste vyber", "status": 200}
+
 
 
 class BarcodeCO:
-    def __init__(self, name: str, manufacturer:str, material: str, parts: list[str], material_code: str, extra: str):
+    def __init__(self, name: str, producer:str, material: str, part_name: str, material_code: str, detail: str):
         self.name = name
-        self.manufacturer = manufacturer
+        self.producer = producer
         self.material = material
-        self.parts = parts
+        self.part_name = part_name
         self.material_code = material_code
-        self.extra = extra
+        self.detail = detail
+
+    def to_dict(self):
+        return {
+            "name": self.name if self.name else "",
+            "producer": self.producer if self.producer else "",
+            "material": self.material if self.material else "",
+            "part_name": self.part_name if self.part_name else "",
+            "material_code": self.material_code if self.material_code else "",
+            "detail": self.detail if self.detail else "",
+        }
+
+    def toJSON(self):
+        return json.dumps(self.to_dict())
