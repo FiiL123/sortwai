@@ -1,0 +1,13 @@
+{% extends 'true_base.html' %}
+{% load static %}
+{% block content %}
+<script src="{% static 'barcode/html5-qrcode.min.js' %}" type="text/javascript"></script>
+
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+<div class="container">
+    <h2>Výsledky vyhľadávania</h2>
+    <p>{{ result }}</p>
+</div>
+
+{% endblock content%}

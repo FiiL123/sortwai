@@ -94,13 +94,11 @@ class ScannerView(TemplateView):
         return context
 
 def get_trash(request, code):
-    # item = get_object_or_404(BarCode, code=code)
-    item = BarCode.objects.filter(code=code)
-    if not item:
-        return HttpResponse('<div id="qr-reader-results"><p>NOT FOUND</p></>')
-    item = item.first()
-    context = {"item": item}
-    return render(request, "partials/product.html", context)
+    url = f"http://barcode:8000/search/?barcode={code}"
+    response = requests.get(url, verify=False)
+    resp_json = response.json()
+    result = resp_json.get("message")
+    return render(request, "results.html", {"result": result, "back_url": reverse('scanner')})
 
 
 @csrf_exempt
