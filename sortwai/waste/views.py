@@ -6,17 +6,18 @@ import requests
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, TemplateView
 from django.urls import reverse
 
 from geopy import Nominatim
 
-from sortwai.waste.forms import MunicipalityForm
+from sortwai.waste.forms import MunicipalityForm, ImageForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
 
-def get_active_municipality(request) -> Municipality|None:
+def get_active_municipality(request) -> Municipality | None:
     if city := request.COOKIES.get("municipality"):
         municipality = Municipality.objects.filter(id=city)
         if municipality.exists():
@@ -58,7 +59,7 @@ class DocumentListView(ListView):
     def get_queryset(self):
         return Document.objects.filter(
             municipality=get_active_municipality(self.request),
-            
+
         )
 
     def get_context_data(self, **kwargs):
@@ -88,10 +89,12 @@ class LocationListView(ListView):
 
 class ScannerView(TemplateView):
     template_name = "scanner.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['back_url'] = reverse('category_list')
         return context
+
 
 def get_trash(request, code):
     # item = get_object_or_404(BarCode, code=code)
@@ -168,6 +171,7 @@ def change_location(request):
             response.set_cookie("municipality", municipality)
             return response
 
+
 # @csrf_exempt
 # def query_request2(request):
 #     if request.method == "POST":
@@ -207,12 +211,12 @@ def query_request(request):
         if not user_query or not city:
             return JsonResponse({"response": "Missing data!"}, status=400)
         try:
-            req = requests.post("http://api:6969", json={"city":{"name": city},
-                                                            "request": {"contents": user_query}
-                                                            })
+            req = requests.post("http://api:6969", json={"city": {"name": city},
+                                                         "request": {"contents": user_query}
+                                                         })
             response_text = req.json()
             print(response_text)
-            category = get_object_or_404(Category, id = response_text["response"][0]["id"])
+            category = get_object_or_404(Category, id=response_text["response"][0]["id"])
 
             def limit_lines_to_list(text, max_lines=5):
                 lines = text.splitlines()
@@ -233,4 +237,23 @@ def query_request(request):
             return JsonResponse({"response": response_text["response"][0], "category": category_data})
         except requests.exceptions.RequestException as e:
             return JsonResponse({"response": "Error connecting to the external service."})
-    return JsonResponse({"response" : "Invalid request."})
+    return JsonResponse({"response": "Invalid request."})
+
+
+class ImageFormView(TemplateView):
+    template_name = "image.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {"image_form": ImageForm()})
+
+    def post(self, request, *args, **kwargs):
+        image_form = ImageForm(request.POST, request.FILES)
+        if image_form.is_valid():
+            image = image_form.cleaned_data["image"]
+            url = "http://image_recognition:8000/recognize/"
+            resp = requests.post(url, files={"image": image})
+            result = resp.json()["name"]
+            return render(request, "results.html", {"result": result, "back_url": reverse('image')})
+        else:
+            return render(request, self.template_name)
+
