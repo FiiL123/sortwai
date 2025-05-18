@@ -15,8 +15,8 @@ class SortWAIBarcodeDatabase(BarcodeDatabase):
             dbname="postgres",
             user="postgres",
             password="postgres",
-            host="localhost",
-            port="6432",
+            host="db",
+            port="5432",
         )
         self.cursor = self.conn.cursor()
 
