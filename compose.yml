@@ -22,8 +22,8 @@ services:
       - .env
     depends_on:
       - db
-    volumes:
-      - ./sortwai:/app/sortwai
+#    volumes:
+#      - ./sortwai:/app/sortwai
 
   api:
     build:

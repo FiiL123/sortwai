@@ -96,7 +96,7 @@ class ScannerView(TemplateView):
 
 def get_trash(request, code):
     url = f"{BARCODE_API}/search/?barcode={code}"
-    response = requests.get(url, verify=False)
+    response = requests.get(url)
     resp_json = response.json()
     result = resp_json.get("message")
     return render(request, "results.html", {"result": result, "back_url": reverse('scanner')})
