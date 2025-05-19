@@ -1,10 +1,9 @@
 {% extends 'true_base.html' %}
 {% load static %}
 {% block content %}
-<script src="https://unpkg.com/htmx.org@2.0.4"></script>
     <form action="{% url 'image' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ image_form.as_div }}
+    {{ form.as_div }}
     <input class="button" type="submit" value="Submit">
     </form>
 

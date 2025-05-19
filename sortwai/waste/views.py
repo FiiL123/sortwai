@@ -8,11 +8,12 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, FormView
 from django.urls import reverse
 
 from geopy import Nominatim
 
+from sortwai.settings import IMAGE_RECOGNITION_API
 from sortwai.waste.forms import MunicipalityForm, ImageForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
@@ -240,17 +241,23 @@ def query_request(request):
     return JsonResponse({"response": "Invalid request."})
 
 
-class ImageFormView(TemplateView):
+class ImageFormView(FormView):
     template_name = "image.html"
+    form_class = ImageForm
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['back_url'] = reverse('category_list')
+        return context
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {"image_form": ImageForm()})
+
+    # def get(self, request, *args, **kwargs):
+    #     return render(request, self.template_name, {"image_form": ImageForm()})
 
     def post(self, request, *args, **kwargs):
-        image_form = ImageForm(request.POST, request.FILES)
+        image_form = self.form_class(request.POST, request.FILES)
         if image_form.is_valid():
             image = image_form.cleaned_data["image"]
-            url = "http://image_recognition:8000/recognize/"
+            url = IMAGE_RECOGNITION_API+"/recognize/"
             resp = requests.post(url, files={"image": image})
             result = resp.json()["name"]
             return render(request, "results.html", {"result": result, "back_url": reverse('image')})
