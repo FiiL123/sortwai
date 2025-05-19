@@ -8,3 +8,4 @@ class MunicipalityForm(forms.Form):
 
 class ImageForm(forms.Form):
     image = forms.ImageField()
+
