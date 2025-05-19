@@ -50,6 +50,16 @@ services:
     command: "poetry run fastapi run ./barcode-service/api.py --port 8000"
     ports:
       - "8003:8000"
+      
+  image_recognition:
+    build:
+      context: .
+      target: web
+    command: "poetry run fastapi run ./image-recognition-service/main.py --port 8000"
+    env_file:
+      - api.env
+    ports:
+      - "8002:8000"
     volumes:
       - ./:/app
 
@@ -77,12 +87,11 @@ services:
       - "7474:7474"
       - "7687:7687"
     healthcheck:
-      test: [ "CMD", "neo4j", "status" ]
+      test: ["CMD", "neo4j", "status"]
       start_period: 30s
       start_interval: 3s
       interval: 10s
       retries: 5
-
 
 volumes:
   postgres_data:
