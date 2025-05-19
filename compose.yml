@@ -78,6 +78,7 @@ services:
       - NEO4J_URI=bolt://neo4j
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASSWORD=bitnami1
+      - NEO4J_CHAT_URI=bolt://neo4j_chat
     env_file:
       - api.env
     depends_on:

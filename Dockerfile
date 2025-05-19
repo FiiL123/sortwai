@@ -40,5 +40,6 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
 COPY --chown=appuser:appuser llm-document-api/main.py ./
+COPY --chown=appuser:appuser llm-document-api/text.md ./
 
 CMD ["poetry", "run", "fastapi", "run", "/app/main.py"]
