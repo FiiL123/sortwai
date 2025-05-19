@@ -12,6 +12,7 @@ from django.urls import reverse
 
 from geopy import Nominatim
 
+from sortwai.settings import BARCODE_API
 from sortwai.waste.forms import MunicipalityForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
@@ -94,7 +95,7 @@ class ScannerView(TemplateView):
         return context
 
 def get_trash(request, code):
-    url = f"http://barcode:8000/search/?barcode={code}"
+    url = f"{BARCODE_API}/search/?barcode={code}"
     response = requests.get(url, verify=False)
     resp_json = response.json()
     result = resp_json.get("message")
