@@ -31,6 +31,7 @@ langchain-openai = "^0.3.0"
 openai = "^1.78.1"
 python-multipart = "^0.0.20"
 pyzbar = "^0.1.9"
+unidecode = "^1.4.0"
 
 [build-system]
 requires = ["poetry-core"]

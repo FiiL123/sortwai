@@ -7,6 +7,7 @@ from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_neo4j import Neo4jGraph
 from langchain_openai import AzureChatOpenAI
 from pydantic import BaseModel
+from unidecode import unidecode
 
 
 class DocumentModel(BaseModel):
@@ -83,6 +84,13 @@ def add_to_graph(request: DocumentRequest):
             )
         ]
     graph_documents = llm_transformer.convert_to_graph_documents(chunks)
+
+    for doc in graph_documents:
+        for node in doc.nodes:
+            if node.id:
+                normalized = unidecode(node.id.replace("_", " "))
+                node.properties["id_normalized"] = normalized
+
     graph.add_graph_documents(graph_documents, include_source=True)
     return {"graph_documents": graph_documents}
 
