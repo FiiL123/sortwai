@@ -13,7 +13,7 @@ from django.urls import reverse
 
 from geopy import Nominatim
 
-from sortwai.settings import BARCODE_API
+from django.conf.settings import BARCODE_API
 from sortwai.waste.forms import MunicipalityForm
 from sortwai.settings import IMAGE_RECOGNITION_API
 from sortwai.waste.forms import MunicipalityForm, ImageForm
