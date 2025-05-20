@@ -27,7 +27,7 @@ from sortwai.waste.views import (
     ScannerView,
     change_location,
     get_city,
-    get_trash,
+    handle_scan,
     query_request, ImageFormView,
 )
 
@@ -38,7 +38,7 @@ urlpatterns = [
     path("locations/", LocationListView.as_view(), name="location_list"),
     path("scanner/", ScannerView.as_view(), name="scanner"),
     path("image/", ImageFormView.as_view(), name="image"),
-    path("scanner/<str:code>", get_trash, name="scanner_product"),
+    path("scanner/<str:code>", handle_scan, name="scanner_product"),
     path("get_location/", get_city, name="get_city"),
     path("change_municipality/", change_location, name="change_municipality"),
     path("query_request/", query_request, name="query_request"),

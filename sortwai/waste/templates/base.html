@@ -135,56 +135,6 @@
             </div>
         </button>
     </div>
-    <div>
-        <div class="result-screen-container">
-            <div class="result-screen-box">
-                <h2>Kategória: </h2>
-                <p id="response-category"></p>
-                <h2>Recyklujte do:</h2>
-                <p id="response-bin"></p>
-                <h2>Popis:</h2>
-                <p id="response-description"></p>
-            </div>
-            <div class="result-screen-box">
-                <img id="response-image" src="" alt="bin image">
-            </div>
-        </div>
-        <div class="result-screen-container">
-            <div class="result-screen-box">
-                <h2>Patrí sem: </h2>
-                <ul id="response-dos"></ul>
-            </div>
-            <div class="result-screen-box">
-                <h2>Nepatrí sem: </h2>
-                <ul id="response-donts"></ul>
-            </div>
-        </div>
-        <div class="result-screen-box" id="response-tips"></div>
-    </div>
-</div>
-
-<div id="loading-hamster">
-    <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
-        <div class="wheel"></div>
-        <div class="hamster">
-            <div class="hamster__body">
-                <div class="hamster__head">
-                    <div class="hamster__ear"></div>
-                    <div class="hamster__eye"></div>
-                    <div class="hamster__nose"></div>
-                </div>
-                <div class="hamster__limb hamster__limb--fr"></div>
-                <div class="hamster__limb hamster__limb--fl"></div>
-                <div class="hamster__limb hamster__limb--br"></div>
-                <div class="hamster__limb hamster__limb--bl"></div>
-                <div class="hamster__tail"></div>
-            </div>
-        </div>
-        <div class="spoke"></div>
-    </div>
-</div>
-
-
 
 <script>
     // Get the modal
@@ -214,86 +164,7 @@
     }
 </script>
 <script>
-    document.getElementById("query-form").addEventListener("submit", function (event) {
-        event.preventDefault();
-        const userQuery = document.getElementById("user-input").value;
-        const city = document.getElementById("municipality").innerHTML;
 
-        const formData = new FormData(this);
-        formData.append("city", city);
-
-        const hamster = document.getElementById("loading-hamster");
-        hamster.classList.add("visible");
-
-        fetch(this.action, {
-            method: "POST",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRFToken": this.querySelector("[name=csrfmiddlewaretoken]").value,
-            },
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was fucked")
-                }
-                return response.json()
-            })
-            .then((data) => {
-                /*{"response":{"category":,"bin":,"id":,"tips":}
-                ,   "category":{"name":","image":,"do":,"dont":,"description":}}
-                * TODO: multiple categories */
-
-                hamster.classList.remove("visible");
-                const category = data.category;
-                const response = data.response;
-                transitionToResult()
-                console.log(JSON.stringify(data));
-                document.getElementById("response-category").innerText = response.category;
-                document.getElementById("response-bin").innerText = category.name;
-                document.getElementById("response-image").src = category.image;
-                document.getElementById("response-description").innerText = category.description;
-                const responseDos = document.getElementById("response-dos");
-                responseDos.innerHTML = "";
-                category.do.forEach(item => {
-                    const li = document.createElement("li");
-                    li.textContent = item;
-                    responseDos.appendChild(li);
-                });
-                const responseDonts = document.getElementById("response-donts");
-                responseDonts.innerHTML = "";
-                category.dont.forEach(item => {
-                    const li = document.createElement("li");
-                    li.textContent = item;
-                    responseDonts.appendChild(li);
-                });
-                document.getElementById("response-tips").innerHTML = response.tips;
-            })
-            .catch((error) => {
-                console.error("❌ AJAX request failed:", error);
-                hamster.classList.remove("visible");
-            });
-    });
-
-    // Transition to result
-    function transitionToResult() {
-        document.getElementById("landing-screen").classList.add("hidden");
-        document.getElementById("result-screen").classList.add("visible");
-    }
-
-    // Handle back button click
-    document.querySelector(".back-button").addEventListener("click", function () {
-        document.getElementById("landing-screen").classList.remove("hidden");
-        const resultScreen = document.getElementById("result-screen");
-
-        // Slide the result screen down
-        resultScreen.classList.add("slide-down");
-
-        // After the slide-down animation completes, reset the result screen
-        setTimeout(() => {
-            resultScreen.classList.remove("visible", "slide-down");
-        }, 500);  // Match the CSS transition duration
-    });
 
     // Wait for DOM to load to handle the toggle button
     document.addEventListener('DOMContentLoaded', () => {
