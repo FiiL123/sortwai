@@ -17,17 +17,31 @@ class BarcodeSearchRequest(BaseModel):
     query: Dict[str, Any]
 
 
-SearchRequest = FulltextSearchRequest | BarcodeSearchRequest
+class VectorSearchRequest(BaseModel):
+    strategy: Literal["vector"]
+    query: List[str]
+
+
+class SmartSearchRequest(BaseModel):
+    strategy: Literal["smart"]
+    query: List[str]
+
+
+SearchRequest = Union[
+    FulltextSearchRequest,
+    BarcodeSearchRequest,
+    VectorSearchRequest,
+    SmartSearchRequest
+]
 
 
 @app.post("/search")
 def search_route(request: SearchRequest):
     try:
-        result = search_service.search(
-            request.strategy,
-            request.query
-        )
-        return result
+        if request.strategy == "fulltext":
+            return search_service.search(request.strategy, request.query, search_level=request.search_level)
+
+        return search_service.search(request.strategy, request.query)
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
