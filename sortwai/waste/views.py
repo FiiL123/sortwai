@@ -13,9 +13,8 @@ from django.urls import reverse
 
 from geopy import Nominatim
 
-from django.conf.settings import BARCODE_API
+from django.conf import settings
 from sortwai.waste.forms import MunicipalityForm
-from sortwai.settings import IMAGE_RECOGNITION_API
 from sortwai.waste.forms import MunicipalityForm, ImageForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
 
@@ -100,7 +99,7 @@ class ScannerView(TemplateView):
 
 
 def get_trash(request, code):
-    url = f"{BARCODE_API}/search/?barcode={code}"
+    url = f"{settings.BARCODE_API}/search/?barcode={code}"
     response = requests.get(url)
     resp_json = response.json()
     result = resp_json.get("message")
@@ -257,7 +256,7 @@ class ImageFormView(FormView):
         image_form = self.form_class(request.POST, request.FILES)
         if image_form.is_valid():
             image = image_form.cleaned_data["image"]
-            url = IMAGE_RECOGNITION_API+"/recognize/"
+            url = settings.IMAGE_RECOGNITION_API+"/recognize/"
             resp = requests.post(url, files={"image": image})
             result = resp.json()["name"]
             return render(request, "results.html", {"result": result, "back_url": reverse('image')})
