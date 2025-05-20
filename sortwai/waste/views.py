@@ -108,14 +108,12 @@ class Trash:
 
 
 def parse_search_response(resp):
-    print(resp)
     try:
         data = resp["data"]
         parts = []
         if type(data) is list:
             for part in data:
-                part_object = Trash(part.get("name"), part.get("bins"))
-                parts.append(part_object)
+                parts.append(Trash(part.get("name"), part.get("bins")))
         elif type(data) is dict:
             for name, bins in data.items():
                 parts.append(Trash(name, bins))
@@ -240,5 +238,5 @@ class ImageFormView(FormView):
             result = resp.json()
             parts = parse_search_response(result)
             if parts:
-                return render(request, "results.html", {"result": result, "back_url": reverse('image')})
+                return render(request, "results.html", {"parts": parts, "back_url": reverse('image')})
         return redirect(reverse("image"))
