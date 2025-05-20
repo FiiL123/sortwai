@@ -100,10 +100,12 @@ class ScannerView(TemplateView):
 
 class Trash:
     name: str
+    categories: list[str]
     bins: list[str]
 
-    def __init__(self, name: str, bins: list[str]):
+    def __init__(self, name: str, categories: list[str], bins: list[str]):
         self.name = name
+        self.categories = [cat.replace("_", " ") for cat in categories]
         self.bins = [bin.replace("_", " ") for bin in bins]
 
 
@@ -113,10 +115,10 @@ def parse_search_response(resp):
         parts = []
         if type(data) is list:
             for part in data:
-                parts.append(Trash(part.get("name"), part.get("bins")))
+                parts.append(Trash(part.get("name"), part.get("Categories"), part.get("Bins")))
         elif type(data) is dict:
-            for name, bins in data.items():
-                parts.append(Trash(name, bins))
+            for name, metadata in data.items():
+                parts.append(Trash(name, metadata.get("Categories"), metadata.get("Bins")))
         return parts
     except KeyError:
         return []
@@ -196,6 +198,7 @@ def change_location(request):
             response.set_cookie("municipality", municipality)
             return response
 
+
 def text_search(keyword: str) -> list[Trash]:
     url = f"{settings.SEARCH_API}/search/"
     data = {
@@ -207,6 +210,7 @@ def text_search(keyword: str) -> list[Trash]:
     response = requests.post(url, data=json.dumps(data))
     parts = parse_search_response(response.json())
     return parts
+
 
 def query_request(request):
     if request.method == "POST":

@@ -5,8 +5,16 @@
     <div style="max-width: 600px; margin: auto; font-family: sans-serif;">
         <h2 style="text-align: center;">Výsledky vyhľadávania</h2>
         <dl> {% for part in parts %}
-            <dt style="margin-top: 20px; font-weight: bold;">Odpad: {{ part.name }}</dt>{% for bin in part.bins %}
-                <dd style="margin-left: 20px;">🔸 <strong>Patrí do:</strong> {{ bin }}</dd> {% endfor %} {% endfor %}
+            <dt style="margin-top: 20px; font-weight: bold;">Odpad: {{ part.name }}</dt>
+            <dt>Patrí do:</dt>
+            {% for bin in part.bins %}
+                <dd style="margin-left: 20px;">🔸 <strong>{{ bin }}</strong></dd>
+            {% endfor %}
+            <dt>Rozpoznané kategórie:</dt>
+            {% for category in part.categories %}
+                <dd style="margin-left: 20px;">🔸 {{ category }}</dd>
+            {% endfor %}
+            {% endfor %}
         </dl>
     </div>
 
