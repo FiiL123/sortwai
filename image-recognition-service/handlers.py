@@ -57,7 +57,7 @@ class BarcodeRecognitionHandler(Handler):
 
 
 class OpenAIRecognizeHandler(Handler):
-    SYSTEM_PROMPT = "You are an object recognition expert. Look at the provided image and describe the object it in a few words in Slovak that can be used in waste recycling. Output just the words, nothing else."
+    SYSTEM_PROMPT = "You are an object recognition expert. Look at the provided image and name the object it in a few words in Slovak that can be used in waste recycling. Output just the words, nothing else."
 
     def __init__(self) -> None:
         super().__init__()

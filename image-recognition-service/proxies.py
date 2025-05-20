@@ -1,20 +1,26 @@
 import base64
 from io import BytesIO
 
+import requests
 from openai import AzureOpenAI
 from PIL.Image import Image
+
+SEARCH_URL = "http://search-api:8000/search"
+BARCODE_URL = "http://barcode:8000/search"
 
 
 class BarcodeServiceProxy:
     def search(self, barcode: str) -> dict | None:
-        # TODO: Call the real service.
-        return {"name": barcode}
+        resp = requests.get(BARCODE_URL, params={"barcode": barcode})
+        resp.raise_for_status()
+        return resp.json()
 
 
 class SearchServiceProxy:
     def search(self, query: str) -> dict | None:
-        # TODO: Call the real service.
-        return {"name": query}
+        resp = requests.post(SEARCH_URL, json={"strategy": "smart", "query": [query]})
+        resp.raise_for_status()
+        return resp.json()
 
 
 class OpenAIVisionProxy:

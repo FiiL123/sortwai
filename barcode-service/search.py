@@ -1,10 +1,22 @@
 import json
 import typing
 
+import requests
+
+
 class SearchServiceProxy:
+    SEARCH_API="http://search-api:8000/search"
     def search(self, context: list['BarcodeCO']):
         # request search service
-        return {"message": "Do kosa.. nejaky si proste vyber", "status": 200}
+        data = {
+            "strategy": "barcode",
+            "query": {
+                "objects": [co.to_dict() for co in context]}
+            ,
+        }
+        response = requests.post(self.SEARCH_API, data=json.dumps(data))
+        data = response.json()
+        return data
 
 
 

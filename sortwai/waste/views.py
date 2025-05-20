@@ -98,12 +98,37 @@ class ScannerView(TemplateView):
         return context
 
 
-def get_trash(request, code):
+class Trash:
+    name: str
+    bins: list[str]
+
+    def __init__(self, name: str, bins: list[str]):
+        self.name = name
+        self.bins = [bin.replace("_", " ") for bin in bins]
+
+
+def parse_search_response(resp):
+    try:
+        data = resp["data"]
+        parts = []
+        if type(data) is list:
+            for part in data:
+                parts.append(Trash(part.get("name"), part.get("bins")))
+        elif type(data) is dict:
+            for name, bins in data.items():
+                parts.append(Trash(name, bins))
+        return parts
+    except KeyError:
+        return []
+
+
+def handle_scan(request, code):
     url = f"{settings.BARCODE_API}/search/?barcode={code}"
     response = requests.get(url)
-    resp_json = response.json()
-    result = resp_json.get("message")
-    return render(request, "results.html", {"result": result, "back_url": reverse('scanner')})
+    parts = parse_search_response(response.json())
+    if parts:
+        return render(request, "results.html", {"parts": parts, "back_url": reverse('scanner')})
+    return redirect(reverse("scanner"))
 
 
 @csrf_exempt
@@ -171,83 +196,35 @@ def change_location(request):
             response.set_cookie("municipality", municipality)
             return response
 
-
-# @csrf_exempt
-# def query_request2(request):
-#     if request.method == "POST":
-#         print("request called")
-#         print(request.POST)
-#         user_query = request.POST.get("q")
-#         city = get_active_municipality(request).name
-#         print(user_query)
-#         print(city)
-#         # response = {"id": 5, "name": "Papierovy papier"}
-#         # category = get_object_or_404(Category, id=response.get("id"))
-#         # print(category)
-#         # return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
-#
-#         if not user_query or not city:
-#             return HttpResponse("MISSING DATA")
-#
-#         try:
-#             req = requests.post("http://api:6969", json={"city":{"name": city},
-#                                                             "request": {"contents": user_query}
-#                                                             })
-#             response_text = req.json()
-#             print("resp", response_text)
-#             category = get_object_or_404(Category, id=response_text.get("id"))
-#             print(category)
-#             return TemplateResponse(request, template="partials/categories2.html", context={"object_list": [category]})
-#         except requests.exceptions.RequestException as e:
-#             return JsonResponse({"response": "Error connecting to the external service."})
-#     return JsonResponse({"response" : "Invalid request."})
-
+def text_search(keyword: str) -> list[Trash]:
+    url = f"{settings.SEARCH_API}/search/"
+    data = {
+        "strategy": "smart",
+        "query": [
+            keyword
+        ]
+    }
+    response = requests.post(url, data=json.dumps(data))
+    parts = parse_search_response(response.json())
+    return parts
 
 def query_request(request):
     if request.method == "POST":
         user_query = request.POST.get("q")
-        city = request.POST.get("city")
-
-        if not user_query or not city:
-            return JsonResponse({"response": "Missing data!"}, status=400)
-        try:
-            req = requests.post("http://api:6969", json={"city": {"name": city},
-                                                         "request": {"contents": user_query}
-                                                         })
-            response_text = req.json()
-            print(response_text)
-            category = get_object_or_404(Category, id=response_text["response"][0]["id"])
-
-            def limit_lines_to_list(text, max_lines=5):
-                lines = text.splitlines()
-                if len(lines) > max_lines:
-                    lines = lines[:max_lines] + ["..."]
-                return lines
-
-            limited_do = limit_lines_to_list(category.do or "")
-            limited_dont = limit_lines_to_list(category.dont or "")
-
-            category_data = {
-                "name": category.name,
-                "image": category.image.url if category.image else None,
-                "do": limited_do,
-                "dont": limited_dont,
-                "description": category.description
-            }
-            return JsonResponse({"response": response_text["response"][0], "category": category_data})
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({"response": "Error connecting to the external service."})
-    return JsonResponse({"response": "Invalid request."})
+        parts = text_search(user_query)
+        if parts:
+            return render(request, "results.html", {"parts": parts, "back_url": reverse('category_list')})
+        return redirect(reverse("category_list"))
 
 
 class ImageFormView(FormView):
     template_name = "image.html"
     form_class = ImageForm
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['back_url'] = reverse('category_list')
         return context
-
 
     # def get(self, request, *args, **kwargs):
     #     return render(request, self.template_name, {"image_form": ImageForm()})
@@ -256,10 +233,10 @@ class ImageFormView(FormView):
         image_form = self.form_class(request.POST, request.FILES)
         if image_form.is_valid():
             image = image_form.cleaned_data["image"]
-            url = settings.IMAGE_RECOGNITION_API+"/recognize/"
+            url = settings.IMAGE_RECOGNITION_API + "/recognize/"
             resp = requests.post(url, files={"image": image})
-            result = resp.json()["name"]
-            return render(request, "results.html", {"result": result, "back_url": reverse('image')})
-        else:
-            return render(request, self.template_name)
-
+            result = resp.json()
+            parts = parse_search_response(result)
+            if parts:
+                return render(request, "results.html", {"parts": parts, "back_url": reverse('image')})
+        return redirect(reverse("image"))
