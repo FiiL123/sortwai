@@ -1,6 +1,7 @@
 from handlers import Neo4jHandler
 from typing import List, Optional, Dict, Any, TypedDict
 from collections import Counter
+from unidecode import unidecode
 
 
 class SuffixStemmerHelper:
@@ -55,7 +56,7 @@ class SearchHelper:
             query_parts = []
             for word in words:
                 original = word
-                prefix = self.stemmer.stem(word)
+                prefix = self.stemmer.stem(unidecode(word))
                 query_parts.append(f"{original}~ {prefix}*")
 
             search_query = " ".join(query_parts)
@@ -93,8 +94,9 @@ class SearchHelper:
 
     def get_category_from_keyword(self, keyword: str, index_name: str) -> Optional[str]:
         words = keyword.strip().lower().split()
-        query_parts = [f"{word}~ {self.stemmer.stem(word)}*" for word in words]
+        query_parts = [f"{word}~ {self.stemmer.stem(unidecode(word))}*" for word in words]
         search_query = " ".join(query_parts)
+
 
         cypher = """
                 CALL db.index.fulltext.queryNodes($index, $query)

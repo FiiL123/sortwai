@@ -19,12 +19,16 @@ class FulltextSearchStrategy(SearchStrategy):
         if not isinstance(query, list) or not all(isinstance(word, str) for word in query):
             raise ValueError("FulltextSearchStrategy expects a list of strings as input.")
 
-        result_map: Dict[str, List[str]] = {}
+        result_map: Dict[str, Dict[str, List[str]]] = {}
         for keyword in query:
+            category_ids = []
             all_bins = []
 
             if search_level == "waste":
                 results = self.search_helper.get_waste_from_keyword(keyword, self.index_name, "1", "fulltext")
+                if not results:
+                    result_map[keyword] = {"Categories": [], "Bins": []}
+                    continue
                 top_waste_id = results[0]["waste_id"]
                 if top_waste_id:
                     category_ids = self.neo4j.get_categories_from_waste(top_waste_id)
@@ -33,11 +37,15 @@ class FulltextSearchStrategy(SearchStrategy):
             elif search_level == "category":
                 category_id = self.search_helper.get_category_from_keyword(keyword, self.index_name)
                 if category_id:
+                    category_ids = [category_id]
                     all_bins.extend(self.neo4j.get_bins_for_category(category_id))
             else:
                 raise ValueError("Invalid search_level. Expected 'waste' or 'category'.")
 
-            result_map[keyword] = list(set(all_bins)) if all_bins else []
+            result_map[keyword] = {
+                "Categories": category_ids,
+                "Bins": list(set(all_bins)) if all_bins else []
+            }
 
         return {
             "strategy": "fulltext",
@@ -65,14 +73,15 @@ class VectorSearchStrategy(SearchStrategy):
         if not isinstance(query, list) or not all(isinstance(word, str) for word in query):
             raise ValueError("FulltextSearchStrategy expects a list of strings as input.")
 
-        result_map: Dict[str, List[str]] = {}
+        result_map: Dict[str, Dict[str, List[str]]] = {}
         for keyword in query:
+            category_ids = []
             all_bins = []
             embedding = self.embedding_handler.get_embedding(keyword)
 
             results = self.search_helper.get_waste_from_keyword(keyword, self.index_name, "1", "vector", embedding)
             if not results:
-                result_map[keyword] = []
+                result_map[keyword] = {"Categories": [], "Bins": []}
                 continue
             top_waste_id = results[0]["waste_id"]
             if top_waste_id:
@@ -80,7 +89,10 @@ class VectorSearchStrategy(SearchStrategy):
                 for category_id in category_ids:
                     all_bins.extend(self.neo4j.get_bins_for_category(category_id))
 
-            result_map[keyword] = list(set(all_bins)) if all_bins else []
+            result_map[keyword] = {
+                "Categories": category_ids,
+                "Bins": list(set(all_bins)) if all_bins else []
+            }
 
         return {
             "strategy": "vector",
@@ -100,7 +112,7 @@ class SmartSearchStrategy(SearchStrategy):
         if not isinstance(query, list) or not all(isinstance(word, str) for word in query):
             raise ValueError("SmartSearchStrategy expects a list of strings as input.")
 
-        result_map = {}
+        result_map: Dict[str, Dict[str, List[str]]] = {}
         for keyword in query:
             fulltext_results = self.search_helper.get_waste_from_keyword(
                 keyword, index_name="fulltext_id_normalized_index", limit="5", search_type="fulltext")
@@ -109,7 +121,7 @@ class SmartSearchStrategy(SearchStrategy):
                 keyword, index_name="waste_vector_index", limit="5", search_type="vector", embedding=embedding)
 
             if not fulltext_results and not vector_results:
-                result_map[keyword] = []
+                result_map[keyword] = {"Categories": [], "Bins": []}
                 continue
 
             fulltext_top = fulltext_results[0]["waste_id"] if fulltext_results else None
@@ -129,7 +141,10 @@ class SmartSearchStrategy(SearchStrategy):
                 for category_id in category_ids:
                     all_bins.extend(self.neo4j.get_bins_for_category(category_id))
 
-                result_map[keyword] = list(set(all_bins)) if all_bins else []
+                result_map[keyword] = {
+                    "Categories": category_ids,
+                    "Bins": list(set(all_bins)) if all_bins else []
+                }
 
         return {
             "strategy": "smart",
@@ -152,15 +167,20 @@ class BarcodeSearchStrategy(SearchStrategy):
             name = obj.get("name", "unknown")
 
             if not material:
-                results.append({"name": name, "bins": []})
+                results.append({
+                    "name": name,
+                    "Categories": [],
+                    "Bins": []
+                })
                 continue
 
             search_result = self.fulltext_strategy.search([material], "category")
-            bins = search_result["data"].get(material, [])
+            entry = search_result["data"].get(material, {})
 
             results.append({
                 "name": name,
-                "bins": bins
+                "Categories": entry.get("Categories", []),
+                "Bins": entry.get("Bins", [])
             })
 
         return {
