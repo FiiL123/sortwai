@@ -13,6 +13,8 @@ from django.urls import reverse
 
 from geopy import Nominatim
 
+from django.conf.settings import BARCODE_API
+from sortwai.waste.forms import MunicipalityForm
 from sortwai.settings import IMAGE_RECOGNITION_API
 from sortwai.waste.forms import MunicipalityForm, ImageForm
 from sortwai.waste.models import BarCode, Category, Document, Location, Municipality
@@ -98,13 +100,11 @@ class ScannerView(TemplateView):
 
 
 def get_trash(request, code):
-    # item = get_object_or_404(BarCode, code=code)
-    item = BarCode.objects.filter(code=code)
-    if not item:
-        return HttpResponse('<div id="qr-reader-results"><p>NOT FOUND</p></>')
-    item = item.first()
-    context = {"item": item}
-    return render(request, "partials/product.html", context)
+    url = f"{BARCODE_API}/search/?barcode={code}"
+    response = requests.get(url)
+    resp_json = response.json()
+    result = resp_json.get("message")
+    return render(request, "results.html", {"result": result, "back_url": reverse('scanner')})
 
 
 @csrf_exempt
