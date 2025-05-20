@@ -1,4 +1,5 @@
-from typing import Dict, Any
+import os
+from typing import Dict, Any, Optional
 from interfaces import SearchStrategy, SearchResult
 from handlers import Neo4jHandler, VectorEmbeddingHandler, IndexHandler, OpenAISmartSearchHandler
 from search_service import FulltextSearchStrategy, BarcodeSearchStrategy, VectorSearchStrategy, SmartSearchStrategy
@@ -13,18 +14,18 @@ class SearchService:
         self._strategies[name] = strategy
         print(f"[SearchService] Registered strategy '{name}'")
 
-    def search(self, strategy_name: str, query: Any) -> SearchResult:
+    def search(self, strategy_name: str, query: Any, search_level: Optional[str] = None) -> SearchResult:
         if strategy_name not in self._strategies:
             raise ValueError(f"Strategy '{strategy_name}' is not registered.")
-        return self._strategies[strategy_name].search(query)
+        return self._strategies[strategy_name].search(query, search_level=search_level)
 
 
 search_service = SearchService()
 
 neo4j = Neo4jHandler(
-    uri="bolt://127.0.0.1:7687",
-    username="PASSWORD",
-    password="USERNAME"
+    uri=os.environ.get("NEO4J_URI"),
+    username=os.environ.get("NEO4J_USERNAME"),
+    password=os.environ.get("NEO4J_PASSWORD")
 )
 openai_handler = OpenAISmartSearchHandler()
 embedding_handler = VectorEmbeddingHandler(neo4j)

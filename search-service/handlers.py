@@ -67,9 +67,9 @@ class VectorEmbeddingHandler:
         self.neo4j = neo4j_handler
 
         self.client = AzureOpenAI(
-            api_key=os.environ.get("KEY"),
-            api_version=os.environ.get("VERSION"),
-            azure_endpoint=os.environ.get("ENDPOINT")
+            api_key=os.environ.get("OPENAI_EMBEDDING_API_KEY"),
+            api_version=os.environ.get("OPENAI_EMBEDDING_API_VERSION"),
+            azure_endpoint=os.environ.get("OPENAI_EMBEDDING_ENDPOINT")
         )
         self.deployment_name = "ace-text-embedding-3-large"
 
@@ -159,9 +159,9 @@ class IndexHandler:
 class OpenAISmartSearchHandler:
     def __init__(self):
         self.client = AzureOpenAI(
-            api_key="KEY",
-            api_version="VERSION",
-            azure_endpoint="ENDPOINT"
+            api_key="AZURE_OPENAI_API_KEY",
+            api_version="OPENAI_API_VERSION",
+            azure_endpoint="AZURE_OPENAI_ENDPOINT"
         )
         self.deployment_name = "ace-gpt-4o-mini"
 

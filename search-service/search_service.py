@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from interfaces import SearchStrategy, SearchResult
 from handlers import Neo4jHandler, VectorEmbeddingHandler, IndexHandler, OpenAISmartSearchHandler
 from helpers import SuffixStemmerHelper, SearchHelper
@@ -61,7 +61,7 @@ class VectorSearchStrategy(SearchStrategy):
         index_handler.ensure_vector_index(self.index_name, self.label, self.property, self.embedding_dim,
                                           self.similarity)
 
-    def search(self, query: Any) -> SearchResult:
+    def search(self, query: Any, search_level: Optional[str] = None) -> SearchResult:
         if not isinstance(query, list) or not all(isinstance(word, str) for word in query):
             raise ValueError("FulltextSearchStrategy expects a list of strings as input.")
 
@@ -96,7 +96,7 @@ class SmartSearchStrategy(SearchStrategy):
         self.search_helper = search_helper
         self.smart_ai = smart_ai_handler
 
-    def search(self, query: Any) -> SearchResult:
+    def search(self, query: Any, search_level: Optional[str] = None) -> SearchResult:
         if not isinstance(query, list) or not all(isinstance(word, str) for word in query):
             raise ValueError("SmartSearchStrategy expects a list of strings as input.")
 
@@ -141,7 +141,7 @@ class BarcodeSearchStrategy(SearchStrategy):
     def __init__(self, fulltextStrategy: FulltextSearchStrategy):
         self.fulltext_strategy = fulltextStrategy
 
-    def search(self, query: Any) -> SearchResult:
+    def search(self, query: Any, search_level: Optional[str] = None) -> SearchResult:
         if not isinstance(query, dict) or "objects" not in query:
             raise ValueError("BarcodeSearchStrategy expects a JSON object with an 'objects' list.")
 
@@ -155,7 +155,7 @@ class BarcodeSearchStrategy(SearchStrategy):
                 results.append({"name": name, "bins": []})
                 continue
 
-            search_result = self.fulltext_strategy.search([material])
+            search_result = self.fulltext_strategy.search([material], "category")
             bins = search_result["data"].get(material, [])
 
             results.append({
