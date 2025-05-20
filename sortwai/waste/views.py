@@ -198,19 +198,22 @@ def change_location(request):
             response.set_cookie("municipality", municipality)
             return response
 
+def text_search(keyword: str) -> list[Trash]:
+    url = f"{settings.SEARCH_API}/search/"
+    data = {
+        "strategy": "fulltext",
+        "query": [
+            keyword
+        ]
+    }
+    response = requests.post(url, data=json.dumps(data))
+    parts = parse_search_response(response.json())
+    return parts
 
 def query_request(request):
     if request.method == "POST":
         user_query = request.POST.get("q")
-        url = f"{settings.SEARCH_API}/search/"
-        data = {
-              "strategy": "fulltext",
-              "query": [
-                user_query
-              ]
-            }
-        response = requests.post(url, data=json.dumps(data))
-        parts = parse_search_response(response.json())
+        parts = text_search(user_query)
         if parts:
             return render(request, "results.html", {"parts": parts, "back_url": reverse('category_list')})
         return redirect(reverse("category_list"))
@@ -234,7 +237,8 @@ class ImageFormView(FormView):
             image = image_form.cleaned_data["image"]
             url = settings.IMAGE_RECOGNITION_API + "/recognize/"
             resp = requests.post(url, files={"image": image})
-            result = resp.json()["name"]
-            return render(request, "results.html", {"result": result, "back_url": reverse('image')})
-        else:
-            return render(request, self.template_name)
+            result = resp.json()
+            parts = parse_search_response(result)
+            if parts:
+                return render(request, "results.html", {"result": result, "back_url": reverse('image')})
+        return redirect(reverse("image"))
