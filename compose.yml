@@ -79,6 +79,25 @@ services:
       neo4j:
         condition: service_healthy
         restart: true
+
+  search-api:
+    build:
+      context: .
+      target: web
+    ports:
+      - "8004:8000"
+    environment:
+      - NEO4J_URI=bolt://neo4j
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=bitnami1
+    env_file:
+      - api.env
+    command: "poetry run fastapi run ./search-service/main.py --port 8000"
+    depends_on:
+      neo4j:
+        condition: service_healthy
+        restart: true
+
   neo4j:
     image: bitnami/neo4j
     volumes:

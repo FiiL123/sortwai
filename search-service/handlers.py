@@ -9,9 +9,9 @@ class Neo4jHandler:
     def __init__(self, uri: str = "bolt://127.0.0.1:7687",
                  username: str = "USERNAME",
                  password: str = "PASSWORD"):
-        self.uri = uri
-        self.username = username
-        self.password = password
+        self.uri = os.environ.get("NEO4J_URI", uri)
+        self.username = os.environ.get("NEO4J_USERNAME", username)
+        self.password = os.environ.get("NEO4J_PASSWORD", password)
         self._driver = None
 
         if self._driver is None:
@@ -67,9 +67,9 @@ class VectorEmbeddingHandler:
         self.neo4j = neo4j_handler
 
         self.client = AzureOpenAI(
-            api_key="KEY",
-            api_version="VERSION",
-            azure_endpoint="ENDPOINT"
+            api_key=os.environ.get("KEY"),
+            api_version=os.environ.get("VERSION"),
+            azure_endpoint=os.environ.get("ENDPOINT")
         )
         self.deployment_name = "ace-text-embedding-3-large"
 
