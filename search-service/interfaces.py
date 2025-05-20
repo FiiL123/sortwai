@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, TypedDict
+from typing import Any, TypedDict, Optional
 
 
 class SearchResult(TypedDict):
@@ -9,5 +9,5 @@ class SearchResult(TypedDict):
 
 class SearchStrategy(ABC):
     @abstractmethod
-    def search(self, query: Any) -> SearchResult:
+    def search(self, query: Any, search_level: Optional[str] = None) -> SearchResult:
         pass

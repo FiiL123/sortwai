@@ -39,6 +39,7 @@ SearchRequest = Union[
 
 @app.post("/search")
 def search_route(request: SearchRequest):
+    print(f"Search was called with request: {request}")
     try:
         if request.strategy == "fulltext":
             return search_service.search(request.strategy, request.query, search_level=request.search_level)
