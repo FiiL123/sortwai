@@ -61,7 +61,6 @@ class DocumentListView(ListView):
     def get_queryset(self):
         return Document.objects.filter(
             municipality=get_active_municipality(self.request),
-
         )
 
     def get_context_data(self, **kwargs):
@@ -94,7 +93,7 @@ class ScannerView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['back_url'] = reverse('category_list')
+        context["back_url"] = reverse("category_list")
         return context
 
 
@@ -115,10 +114,14 @@ def parse_search_response(resp):
         parts = []
         if type(data) is list:
             for part in data:
-                parts.append(Trash(part.get("name"), part.get("Categories"), part.get("Bins")))
+                parts.append(
+                    Trash(part.get("name"), part.get("Categories"), part.get("Bins"))
+                )
         elif type(data) is dict:
             for name, metadata in data.items():
-                parts.append(Trash(name, metadata.get("Categories"), metadata.get("Bins")))
+                parts.append(
+                    Trash(name, metadata.get("Categories"), metadata.get("Bins"))
+                )
         return parts
     except KeyError:
         return []
@@ -129,7 +132,9 @@ def handle_scan(request, code):
     response = requests.get(url)
     parts = parse_search_response(response.json())
     if parts:
-        return render(request, "results.html", {"parts": parts, "back_url": reverse('scanner')})
+        return render(
+            request, "results.html", {"parts": parts, "back_url": reverse("scanner")}
+        )
     return redirect(reverse("scanner"))
 
 
@@ -201,12 +206,7 @@ def change_location(request):
 
 def text_search(keyword: str) -> list[Trash]:
     url = f"{settings.SEARCH_API}/search/"
-    data = {
-        "strategy": "smart",
-        "query": [
-            keyword
-        ]
-    }
+    data = {"strategy": "smart", "query": [keyword]}
     response = requests.post(url, data=json.dumps(data))
     parts = parse_search_response(response.json())
     return parts
@@ -217,7 +217,11 @@ def query_request(request):
         user_query = request.POST.get("q")
         parts = text_search(user_query)
         if parts:
-            return render(request, "results.html", {"parts": parts, "back_url": reverse('category_list')})
+            return render(
+                request,
+                "results.html",
+                {"parts": parts, "back_url": reverse("category_list")},
+            )
         return redirect(reverse("category_list"))
 
 
@@ -227,7 +231,7 @@ class ImageFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['back_url'] = reverse('category_list')
+        context["back_url"] = reverse("category_list")
         return context
 
     # def get(self, request, *args, **kwargs):
@@ -242,5 +246,32 @@ class ImageFormView(FormView):
             result = resp.json()
             parts = parse_search_response(result)
             if parts:
-                return render(request, "results.html", {"parts": parts, "back_url": reverse('image')})
+                return render(
+                    request,
+                    "results.html",
+                    {"parts": parts, "back_url": reverse("image")},
+                )
         return redirect(reverse("image"))
+
+
+class ChatWidgetView(View):
+    def get_messages(self):
+        # TODO: Messages could be saved in session and sent to the backend, when support is introduced.
+        return [("Dobrý deň, ako vám môžem pomôcť s triedením?", True)]
+
+    def get(self, request, *args, **kwargs):
+        messages = self.get_messages()
+        return render(request, "chat.html", {"messages": messages})
+
+    def post(self, request, *args, **kwargs):
+        message = request.POST.get("message")
+
+        messages = self.get_messages()
+        if message:
+            messages.append((message, False))
+
+            resp = requests.post(settings.CHAT_API, json={"query": message})
+            resp.raise_for_status()
+            messages.append((resp.json()["result"], True))
+
+        return render(request, "chat.html", {"messages": messages})
