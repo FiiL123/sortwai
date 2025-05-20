@@ -107,12 +107,12 @@ services:
   chat-document-api:
     build:
       context: .
-      target: chat-document-api
+      target: web
     volumes:
       - .:/app
-    command: "poetry run uvicorn chat-document-api.main:app --host 0.0.0.0 --port 9000 --reload"
+    command: "poetry run fastapi run ./chat-document-api/main.py --port 8000"
     ports:
-      - "9000:9000"
+      - "8005:8000"
     environment:
       - NEO4J_URI=bolt://neo4j_chat
       - NEO4J_USERNAME=neo4j

@@ -82,11 +82,12 @@ Format the response as a single paragraph in natural slovak language.
 """
 )
 
+
 class UserQuery(BaseModel):
     query: str
 
-class EmbeddingService(Protocol):
 
+class EmbeddingService(Protocol):
     @property
     @abstractmethod
     def model(self):
@@ -94,25 +95,22 @@ class EmbeddingService(Protocol):
 
 
 class VectorSearchService(Protocol):
-
     def get_closest_node_id(self, question: str, k: int = 1) -> str:
         """Return the `id` property of the closest KG node."""
 
 
 class QAService(Protocol):
-
     def answer(self, question: str, node_id: str):
         """Return the assistant's answer."""
 
 
 class OpenAIEmbeddingService:
-
     def __init__(self) -> None:
         self._model = AzureOpenAIEmbeddings(
-            model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME_EMBEDDING"),
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_EMBEDDING"),
-            api_key=os.getenv("AZURE_OPENAI_API_KEY_EMBEDDING"),
-            openai_api_version=os.getenv("OPENAI_API_VERSION_EMBEDDING"),
+            model=os.getenv("OPENAI_EMBEDDING_MODEL"),
+            azure_endpoint=os.getenv("OPENAI_EMBEDDING_ENDPOINT"),
+            api_key=os.getenv("OPENAI_EMBEDDING_API_KEY"),
+            openai_api_version=os.getenv("OPENAI_EMBEDDING_API_VERSION"),
         )
 
     @property
@@ -121,7 +119,6 @@ class OpenAIEmbeddingService:
 
 
 class Neo4jVectorSearchService:
-
     def __init__(self, embedding_service: EmbeddingService) -> None:
         self._vector = Neo4jVector.from_existing_graph(
             url=os.environ["NEO4J_URI"],
@@ -137,7 +134,6 @@ class Neo4jVectorSearchService:
 
 
 class GraphQAService:
-
     def __init__(self, llm, graph):
         self._qa_chain = GraphCypherQAChain.from_llm(
             llm,
@@ -153,7 +149,6 @@ class GraphQAService:
 
 
 class QueryMediator:
-
     def __init__(
         self,
         vector_service: VectorSearchService,
@@ -188,8 +183,3 @@ def get_mediator() -> QueryMediator:
 @app.post("/query")
 async def query(user_query: UserQuery, mediator: QueryMediator = Depends(get_mediator)):
     return mediator.handle(user_query.query)
-
-
-@app.get("/test")
-def test():
-    return {"hello": "world"}

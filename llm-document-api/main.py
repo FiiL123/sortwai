@@ -91,29 +91,33 @@ llm_transformer_for_chat = LLMGraphTransformer(
 )
 
 graph = Neo4jGraph(refresh_schema=False)
-graph_for_chat = Neo4jGraph(url=os.environ['NEO4J_CHAT_URI'], refresh_schema=False)
+graph_for_chat = Neo4jGraph(url=os.environ["NEO4J_CHAT_URI"], refresh_schema=False)
 app = FastAPI()
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
+
 @app.post("/import-document")
 def add_to_graph(request: DocumentRequest):
     def create_chat_graph(document):
-
-        splitter = MarkdownHeaderTextSplitter(headers_to_split_on=[
-            ("#", "Header1"),
-            ("##", "Header2"),
-            ("###", "Header3")
-        ])
+        splitter = MarkdownHeaderTextSplitter(
+            headers_to_split_on=[
+                ("#", "Header1"),
+                ("##", "Header2"),
+                ("###", "Header3"),
+            ]
+        )
         splitted_chunks = splitter.split_text(document)
 
-        filtered_chunks = [chunk for chunk in splitted_chunks if len(chunk.page_content.strip()) > 30]
+        filtered_chunks = [
+            chunk for chunk in splitted_chunks if len(chunk.page_content.strip()) > 30
+        ]
 
         def split_into_batches(items, batch_size):
             for i in range(0, len(items), batch_size):
-                yield items[i: i + batch_size]
+                yield items[i : i + batch_size]
 
         all_documents = []
 
