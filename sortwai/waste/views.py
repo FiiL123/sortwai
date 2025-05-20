@@ -199,7 +199,7 @@ def change_location(request):
 def text_search(keyword: str) -> list[Trash]:
     url = f"{settings.SEARCH_API}/search/"
     data = {
-        "strategy": "fulltext",
+        "strategy": "smart",
         "query": [
             keyword
         ]
