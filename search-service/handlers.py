@@ -159,9 +159,9 @@ class IndexHandler:
 class OpenAISmartSearchHandler:
     def __init__(self):
         self.client = AzureOpenAI(
-            api_key="AZURE_OPENAI_API_KEY",
-            api_version="OPENAI_API_VERSION",
-            azure_endpoint="AZURE_OPENAI_ENDPOINT"
+            api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
+            api_version=os.environ.get("OPENAI_API_VERSION"),
+            azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT")
         )
         self.deployment_name = "ace-gpt-4o-mini"
 
