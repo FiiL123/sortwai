@@ -8,7 +8,8 @@ create table products
     name      varchar,
     producer  varchar,
     material  varchar,
-    barcode   integer not null,
+    barcode   varchar not null,
     part_name varchar,
-    detail    varchar
+    detail    varchar,
+    material_code varchar
 );
