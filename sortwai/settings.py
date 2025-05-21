@@ -150,4 +150,4 @@ SORTWAI_LLM_API = "http://llm-document-api:8000"
 BARCODE_API = "http://barcode:8000"
 IMAGE_RECOGNITION_API = "http://image_recognition:8000"
 SEARCH_API = "http://search-api:8000"
-
+CHAT_API = "http://chat-document-api:8000/query"

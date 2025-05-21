@@ -14,6 +14,9 @@ services:
     build:
       context: .
       target: web
+    volumes:
+      - .:/app
+    command: "poetry run python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     environment:
@@ -22,14 +25,16 @@ services:
       - .env
     depends_on:
       - db
-#    volumes:
-#      - ./sortwai:/app/sortwai
+  #    volumes:
+  #      - ./sortwai:/app/sortwai
 
   api:
     build:
       context: .
       target: web
-    command: "poetry run fastapi run ./API/main.py --port 6969"
+    volumes:
+      - .:/app
+    command: "poetry run uvicorn API.main:app --host 0.0.0.0 --port 6969 --reload"
     ports:
       - "6969:6969"
     environment:
@@ -50,7 +55,7 @@ services:
     command: "poetry run fastapi run ./barcode-service/api.py --port 8000"
     ports:
       - "8003:8000"
-      
+
   image_recognition:
     build:
       context: .
@@ -73,6 +78,7 @@ services:
       - NEO4J_URI=bolt://neo4j
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASSWORD=bitnami1
+      - NEO4J_CHAT_URI=bolt://neo4j_chat
     env_file:
       - api.env
     depends_on:
@@ -98,6 +104,26 @@ services:
         condition: service_healthy
         restart: true
 
+  chat-document-api:
+    build:
+      context: .
+      target: web
+    volumes:
+      - .:/app
+    command: "poetry run fastapi run ./chat-document-api/main.py --port 8000"
+    ports:
+      - "8005:8000"
+    environment:
+      - NEO4J_URI=bolt://neo4j_chat
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=bitnami1
+    env_file:
+      - api.env
+    depends_on:
+      neo4j_chat:
+        condition: service_healthy
+        restart: true
+
   neo4j:
     image: bitnami/neo4j
     volumes:
@@ -112,6 +138,21 @@ services:
       interval: 10s
       retries: 5
 
+  neo4j_chat:
+    image: bitnami/neo4j
+    volumes:
+      - neo4j_data_chat:/bitnami
+    ports:
+      - "8474:7474"
+      - "8687:7687"
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      start_period: 30s
+      start_interval: 3s
+      interval: 10s
+      retries: 5
+
 volumes:
   postgres_data:
   neo4j_data:
+  neo4j_data_chat:
