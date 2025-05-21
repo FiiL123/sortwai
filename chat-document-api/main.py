@@ -107,7 +107,7 @@ class QAService(Protocol):
 class OpenAIEmbeddingService:
     def __init__(self) -> None:
         self._model = AzureOpenAIEmbeddings(
-            model=os.getenv("OPENAI_EMBEDDING_MODEL"),
+            model=os.getenv("OPENAI_EMBEDDING_DEPLOYMENT_NAME"),
             azure_endpoint=os.getenv("OPENAI_EMBEDDING_ENDPOINT"),
             api_key=os.getenv("OPENAI_EMBEDDING_API_KEY"),
             openai_api_version=os.getenv("OPENAI_EMBEDDING_API_VERSION"),
