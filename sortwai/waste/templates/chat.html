@@ -1,0 +1,19 @@
+{# chat widget #}
+<form class="chat" method="post" action="{% url 'chat_widget' %}" hx-post="{% url 'chat_widget' %}" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="chat-header">
+    Odpadový asistent
+  </div>
+
+  <div class="chat-messages">
+    {% for message in messages %}
+    <div class="chat-message {% if not message.1 %}chat-message-user{% endif %}">
+      {{ message.0 }}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="chat-input">
+    <input type="text" name="message">
+  </div>
+</form>

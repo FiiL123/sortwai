@@ -32,8 +32,12 @@ cp api.env.example api.env
   + `AZURE_OPENAI_API_KEY`
   + `AZURE_OPENAI_DEPLOYMENT_NAME`: e.g. `ace-gpt-4o-mini`
   + `OPENAI_API_VERSION`: e. g. `2024-08-01-preview`
+  + `OPENAI_API_VERSION_EMBEDDING`:  the personal endpoint for your embedding OPEN AI model
+  + `AZURE_OPENAI_API_KEY`
+  + `AZURE_OPENAI_DEPLOYMENT_NAME`: e.g. `text-embedding-3-large`
+  + `OPENAI_API_VERSION`: e.g. `2023-05-15`
   + `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`: required when using a dedicated Neo4j database
-
+  
 3. Run the app
 ```shell
 docker compose up

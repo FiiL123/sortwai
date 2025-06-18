@@ -99,6 +99,8 @@
     </div>
 
     {% block body %}{% endblock %}
+
+  <div class="chat" hx-get="{% url "chat_widget" %}" hx-trigger="load" hx-swap="outerHTML"></div>
 </div>
 
 

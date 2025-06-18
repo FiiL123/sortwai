@@ -18,17 +18,19 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 from sortwai.waste.views import (
     CategoryListView,
+    ChatWidgetView,
     DocumentListView,
+    ImageFormView,
     LocationListView,
     ScannerView,
     change_location,
     get_city,
     handle_scan,
-    query_request, ImageFormView,
+    query_request,
 )
 
 urlpatterns = [
@@ -42,6 +44,7 @@ urlpatterns = [
     path("get_location/", get_city, name="get_city"),
     path("change_municipality/", change_location, name="change_municipality"),
     path("query_request/", query_request, name="query_request"),
+    path("chat/", ChatWidgetView.as_view(), name="chat_widget"),
     path("operator/", include("sortwai.operator.urls")),
 ]
 
